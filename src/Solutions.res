@@ -6,8 +6,8 @@ let transpose = arr => {
     if i == 0 {
       cur->Array.map(x => [x])
     } else {
-      acc->Array.map(x => {
-        [...x, cur->Array.getUnsafe(i)]
+      acc->Array.mapWithIndex((x, j) => {
+        [...x, arr->Array.getUnsafe(i)->Array.getUnsafe(j)]
       })
     }
   })
@@ -31,6 +31,20 @@ let colorToString = color =>
   | Orange => "Orange"
   | Cyan => "Cyan"
   | Brown => "Brown"
+  }
+
+let colorToHex = color =>
+  switch color {
+  | Black => "#000"
+  | Blue => "#00f"
+  | Red => "#f00"
+  | Green => "#0f0"
+  | Yellow => "#ff0"
+  | Gray => "#aaa"
+  | Pink => "#f0f"
+  | Orange => "#fa0"
+  | Cyan => "#0ff"
+  | Brown => "#550"
   }
 
 let toColor = color =>
@@ -172,6 +186,32 @@ let compareBlocks = (a, b) => {
   }
 }
 
+module Grid = {
+  @react.component
+  let make = (~block) => {
+    <div className="p-2 ">
+      <div className="flex flex-row gap-px bg-gray-500 w-fit ">
+        {block
+        ->Array.map(row => {
+          <div className="flex flex-col gap-px">
+            {row
+            ->Array.map(el => {
+              <div
+                style={{
+                  backgroundColor: el->colorToHex,
+                }}
+                className="w-5 h-5"
+              />
+            })
+            ->React.array}
+          </div>
+        })
+        ->React.array}
+      </div>
+    </div>
+  }
+}
+
 module Main_0b148d64 = {
   let main = input => {
     let blackRows = input->findLinesOfColor(Black)
@@ -180,7 +220,13 @@ module Main_0b148d64 = {
     let (numRows, numCols) = input->dimensions
 
     let blockSpecs = getBlockSpecs(blackRows->converses(numRows), blackColumns->converses(numCols))
-
+    Console.log5(
+      blackRows,
+      blackColumns,
+      blackRows->converses(numRows),
+      blackColumns->converses(numCols),
+      blockSpecs,
+    )
     let blocks = carve(input, blockSpecs)
 
     let resultBlock =
@@ -198,8 +244,25 @@ module Main_0b148d64 = {
     resultBlock
   }
 
-  let test = () => {
-    let outputTest = main(test["input"]->toColors)
-    outputTest->Option.mapOr(false, output_ => compareBlocks(output_, test["output"]->toColors))
+  @react.component
+  let make = () => {
+    let output = main(test["input"]->toColors)
+    // let testResult =
+    //   outputTest->Option.mapOr(false, output_ => compareBlocks(output_, test["output"]->toColors))
+    // Console.log(testResult)
+    <div className="flex flex-row">
+      <Grid block={test["input"]->toColors} />
+      {output->Option.mapOr(React.null, output_ =>
+        <div>
+          <Grid block={output_} />
+          <Grid block={test["output"]->toColors} />
+          <div className="p-2 font-black text-xl">
+            {(
+              compareBlocks(output_, test["output"]->toColors) ? "Solved!" : "Unsolved"
+            )->React.string}
+          </div>
+        </div>
+      )}
+    </div>
   }
 }

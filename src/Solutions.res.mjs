@@ -6,6 +6,7 @@ import * as Caml_option from "rescript/lib/es6/caml_option.js";
 import * as Core__Array from "@rescript/core/src/Core__Array.res.mjs";
 import * as Core__Option from "@rescript/core/src/Core__Option.res.mjs";
 import * as Belt_MapString from "rescript/lib/es6/belt_MapString.js";
+import * as JsxRuntime from "react/jsx-runtime";
 
 function keepMapWithIndex(arr, f) {
   return Belt_Array.keepMap(arr.map(function (x, i) {
@@ -25,10 +26,10 @@ function transpose(arr) {
                               return [x];
                             });
                 } else {
-                  return acc.map(function (x) {
+                  return acc.map(function (x, j) {
                               return Belt_Array.concatMany([
                                           x,
-                                          [cur[i]]
+                                          [arr[i][j]]
                                         ]);
                             });
                 }
@@ -68,6 +69,32 @@ function colorToString(color) {
         return "Cyan";
     case "Brown" :
         return "Brown";
+    
+  }
+}
+
+function colorToHex(color) {
+  switch (color) {
+    case "Black" :
+        return "#000";
+    case "Blue" :
+        return "#00f";
+    case "Red" :
+        return "#f00";
+    case "Green" :
+        return "#0f0";
+    case "Yellow" :
+        return "#ff0";
+    case "Gray" :
+        return "#aaa";
+    case "Pink" :
+        return "#f0f";
+    case "Orange" :
+        return "#fa0";
+    case "Cyan" :
+        return "#0ff";
+    case "Brown" :
+        return "#550";
     
   }
 }
@@ -581,11 +608,40 @@ function compareBlocks(a, b) {
   }
 }
 
+function Solutions$Grid(props) {
+  return JsxRuntime.jsx("div", {
+              children: JsxRuntime.jsx("div", {
+                    children: props.block.map(function (row) {
+                          return JsxRuntime.jsx("div", {
+                                      children: row.map(function (el) {
+                                            return JsxRuntime.jsx("div", {
+                                                        className: "w-5 h-5",
+                                                        style: {
+                                                          backgroundColor: colorToHex(el)
+                                                        }
+                                                      });
+                                          }),
+                                      className: "flex flex-col gap-px"
+                                    });
+                        }),
+                    className: "flex flex-row gap-px bg-gray-500 w-fit "
+                  }),
+              className: "p-2 "
+            });
+}
+
+var Grid = {
+  make: Solutions$Grid
+};
+
 function main(input) {
   var blackRows = findLinesOfColor(input, "Black");
   var blackColumns = findLinesOfColor(transpose(input), "Black");
   var match = dimensions(input);
-  var blockSpecs = getBlockSpecs(converses(blackRows, match[0]), converses(blackColumns, match[1]));
+  var numCols = match[1];
+  var numRows = match[0];
+  var blockSpecs = getBlockSpecs(converses(blackRows, numRows), converses(blackColumns, numCols));
+  console.log(blackRows, blackColumns, converses(blackRows, numRows), converses(blackColumns, numCols), blockSpecs);
   var blocks = carve(input, blockSpecs);
   return Core__Option.flatMap(Belt_MapString.toArray(colorCount(Belt_Array.keepMap(blocksNonBlackColor(blocks), (function (param) {
                               return param[1];
@@ -603,16 +659,37 @@ function main(input) {
               }));
 }
 
-function test$1() {
-  var outputTest = main(toColors(test.input));
-  return Core__Option.mapOr(outputTest, false, (function (output_) {
-                return compareBlocks(output_, toColors(test.output));
-              }));
+function Solutions$Main_0b148d64(props) {
+  var output = main(toColors(test.input));
+  return JsxRuntime.jsxs("div", {
+              children: [
+                JsxRuntime.jsx(Solutions$Grid, {
+                      block: toColors(test.input)
+                    }),
+                Core__Option.mapOr(output, null, (function (output_) {
+                        return JsxRuntime.jsxs("div", {
+                                    children: [
+                                      JsxRuntime.jsx(Solutions$Grid, {
+                                            block: output_
+                                          }),
+                                      JsxRuntime.jsx(Solutions$Grid, {
+                                            block: toColors(test.output)
+                                          }),
+                                      JsxRuntime.jsx("div", {
+                                            children: compareBlocks(output_, toColors(test.output)) ? "Solved!" : "Unsolved",
+                                            className: "p-2 font-black text-xl"
+                                          })
+                                    ]
+                                  });
+                      }))
+              ],
+              className: "flex flex-row"
+            });
 }
 
 var Main_0b148d64 = {
   main: main,
-  test: test$1
+  make: Solutions$Main_0b148d64
 };
 
 export {
@@ -620,6 +697,7 @@ export {
   transpose ,
   findLinesOfColor ,
   colorToString ,
+  colorToHex ,
   toColor ,
   toColors ,
   range ,
@@ -636,6 +714,7 @@ export {
   colorCount ,
   test ,
   compareBlocks ,
+  Grid ,
   Main_0b148d64 ,
 }
-/* No side effect */
+/* react/jsx-runtime Not a pure module */
