@@ -5,6 +5,7 @@ import * as Belt_Array from "rescript/lib/es6/belt_Array.js";
 import * as Caml_option from "rescript/lib/es6/caml_option.js";
 import * as Core__Array from "@rescript/core/src/Core__Array.res.mjs";
 import * as Core__Option from "@rescript/core/src/Core__Option.res.mjs";
+import * as Belt_MapString from "rescript/lib/es6/belt_MapString.js";
 
 function keepMapWithIndex(arr, f) {
   return Belt_Array.keepMap(arr.map(function (x, i) {
@@ -43,6 +44,65 @@ function findLinesOfColor(full, color) {
                 }
                 
               }));
+}
+
+function colorToString(color) {
+  switch (color) {
+    case "Black" :
+        return "Black";
+    case "Blue" :
+        return "Blue";
+    case "Red" :
+        return "Red";
+    case "Green" :
+        return "Green";
+    case "Yellow" :
+        return "Yellow";
+    case "Gray" :
+        return "Gray";
+    case "Pink" :
+        return "Pink";
+    case "Orange" :
+        return "Orange";
+    case "Cyan" :
+        return "Cyan";
+    case "Brown" :
+        return "Brown";
+    
+  }
+}
+
+function toColor(color) {
+  switch (color) {
+    case 1 :
+        return "Blue";
+    case 2 :
+        return "Red";
+    case 3 :
+        return "Green";
+    case 4 :
+        return "Yellow";
+    case 5 :
+        return "Gray";
+    case 6 :
+        return "Pink";
+    case 7 :
+        return "Orange";
+    case 8 :
+        return "Cyan";
+    case 9 :
+        return "Brown";
+    default:
+      return "Black";
+  }
+}
+
+function toColors(arr) {
+  return arr.map(function (x) {
+              return x.map(function (y) {
+                          return toColor(y);
+                        });
+            });
 }
 
 function range(max) {
@@ -136,23 +196,432 @@ function carve(full, blockSpecs) {
             });
 }
 
-function main() {
-  var full = [[]];
-  var blackRows = findLinesOfColor(full, "Black");
-  var blackColumns = findLinesOfColor(transpose(full), "Black");
-  var match = dimensions(full);
+function blocksNonBlackColor(blocks) {
+  return blocks.map(function (block) {
+              return [
+                      block,
+                      Core__Array.reduce(Belt_Array.concatMany(block), undefined, (function (acc, cur) {
+                              if (Core__Option.isSome(acc) || cur === "Black") {
+                                return acc;
+                              } else {
+                                return cur;
+                              }
+                            }))
+                    ];
+            });
+}
+
+function colorCount(arr) {
+  return Core__Array.reduce(arr, undefined, (function (acc, cur) {
+                return Belt_MapString.update(acc, colorToString(cur), (function (o) {
+                              if (o !== undefined) {
+                                return o + 1 | 0;
+                              } else {
+                                return 1;
+                              }
+                            }));
+              }));
+}
+
+var test = {
+  input: [
+    [
+      1,
+      1,
+      1,
+      1,
+      0,
+      1,
+      0,
+      0,
+      3,
+      0,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      0
+    ],
+    [
+      1,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      3,
+      0,
+      3,
+      3,
+      3,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      1,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      3,
+      3,
+      3,
+      3,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0,
+      0,
+      3,
+      3,
+      0,
+      3,
+      3,
+      0,
+      3,
+      0,
+      0
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      3,
+      0,
+      3,
+      3,
+      3,
+      0,
+      3,
+      3
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      3,
+      3,
+      0,
+      0,
+      0,
+      3,
+      0,
+      0,
+      3
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      3,
+      0,
+      0,
+      0,
+      0,
+      3,
+      0,
+      0,
+      3,
+      3,
+      3,
+      0,
+      3,
+      0,
+      3,
+      0,
+      3
+    ],
+    [
+      0,
+      3,
+      3,
+      0,
+      0,
+      3,
+      0,
+      0,
+      0,
+      3,
+      0,
+      3,
+      3,
+      3,
+      0,
+      0,
+      0
+    ],
+    [
+      3,
+      3,
+      3,
+      3,
+      3,
+      0,
+      0,
+      0,
+      3,
+      0,
+      0,
+      0,
+      3,
+      0,
+      0,
+      0,
+      3
+    ],
+    [
+      3,
+      0,
+      3,
+      0,
+      3,
+      0,
+      0,
+      0,
+      0,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      0,
+      3
+    ],
+    [
+      0,
+      3,
+      3,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      3,
+      3,
+      3,
+      0,
+      3,
+      3,
+      0
+    ]
+  ],
+  output: [
+    [
+      1,
+      1,
+      1,
+      1,
+      0,
+      1
+    ],
+    [
+      1,
+      0,
+      1,
+      0,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      0,
+      1,
+      1,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ]
+  ]
+};
+
+function compareBlocks(a, b) {
+  var match = dimensions(a);
+  var match$1 = dimensions(b);
+  if (match[0] !== match$1[0] || match[1] !== match$1[1]) {
+    return false;
+  } else {
+    return Core__Array.reduceWithIndex(a, true, (function (acc, row, i) {
+                  return Core__Array.reduceWithIndex(row, acc, (function (acc2, el, j) {
+                                if (acc2) {
+                                  return Caml_obj.equal(el, b[i][j]);
+                                } else {
+                                  return false;
+                                }
+                              }));
+                }));
+  }
+}
+
+function main(input) {
+  var blackRows = findLinesOfColor(input, "Black");
+  var blackColumns = findLinesOfColor(transpose(input), "Black");
+  var match = dimensions(input);
   var blockSpecs = getBlockSpecs(converses(blackRows, match[0]), converses(blackColumns, match[1]));
-  carve(full, blockSpecs);
+  var blocks = carve(input, blockSpecs);
+  return Core__Option.flatMap(Belt_MapString.toArray(colorCount(Belt_Array.keepMap(blocksNonBlackColor(blocks), (function (param) {
+                              return param[1];
+                            })))).find(function (param) {
+                  return param[1] === 1;
+                }), (function (param) {
+                var k = param[0];
+                return Core__Option.map(blocksNonBlackColor(blocks).find(function (param) {
+                                return Core__Option.mapOr(param[1], false, (function (c) {
+                                              return colorToString(c) === k;
+                                            }));
+                              }), (function (param) {
+                              return param[0];
+                            }));
+              }));
+}
+
+function test$1() {
+  var outputTest = main(toColors(test.input));
+  return Core__Option.mapOr(outputTest, false, (function (output_) {
+                return compareBlocks(output_, toColors(test.output));
+              }));
 }
 
 var Main_0b148d64 = {
-  main: main
+  main: main,
+  test: test$1
 };
 
 export {
   keepMapWithIndex ,
   transpose ,
   findLinesOfColor ,
+  colorToString ,
+  toColor ,
+  toColors ,
   range ,
   converses ,
   getLastEl ,
@@ -163,6 +632,10 @@ export {
   subSet ,
   getBlockSpecs ,
   carve ,
+  blocksNonBlackColor ,
+  colorCount ,
+  test ,
+  compareBlocks ,
   Main_0b148d64 ,
 }
 /* No side effect */
