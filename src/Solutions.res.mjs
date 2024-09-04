@@ -78,23 +78,23 @@ function colorToHex(color) {
     case "Black" :
         return "#000";
     case "Blue" :
-        return "#00f";
+        return "#0074d9";
     case "Red" :
-        return "#f00";
+        return "#ff4136";
     case "Green" :
-        return "#0f0";
+        return "#2ecc40";
     case "Yellow" :
-        return "#ff0";
+        return "#ffdc00";
     case "Gray" :
         return "#aaa";
     case "Pink" :
-        return "#f0f";
+        return "#f012be";
     case "Orange" :
-        return "#fa0";
+        return "#ff851b";
     case "Cyan" :
-        return "#0ff";
+        return "#7fdbff";
     case "Brown" :
-        return "#550";
+        return "#870c25";
     
   }
 }
@@ -665,7 +665,7 @@ function Solutions$Grid(props) {
                                       className: "flex flex-col gap-px"
                                     });
                         }),
-                    className: "flex flex-row gap-px bg-gray-500 w-fit "
+                    className: "flex flex-row gap-px bg-gray-600 w-fit "
                   }),
               className: "p-2 "
             });

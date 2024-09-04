@@ -36,15 +36,15 @@ let colorToString = color =>
 let colorToHex = color =>
   switch color {
   | Black => "#000"
-  | Blue => "#00f"
-  | Red => "#f00"
-  | Green => "#0f0"
-  | Yellow => "#ff0"
+  | Blue => "#0074d9"
+  | Red => "#ff4136"
+  | Green => "#2ecc40"
+  | Yellow => "#ffdc00"
   | Gray => "#aaa"
-  | Pink => "#f0f"
-  | Orange => "#fa0"
-  | Cyan => "#0ff"
-  | Brown => "#550"
+  | Pink => "#f012be"
+  | Orange => "#ff851b"
+  | Cyan => "#7fdbff"
+  | Brown => "#870c25"
   }
 
 let toColor = color =>
@@ -236,7 +236,7 @@ module Grid = {
   @react.component
   let make = (~block) => {
     <div className="p-2 ">
-      <div className="flex flex-row gap-px bg-gray-500 w-fit ">
+      <div className="flex flex-row gap-px bg-gray-600 w-fit ">
         {block
         ->Array.map(row => {
           <div className="flex flex-col gap-px">
