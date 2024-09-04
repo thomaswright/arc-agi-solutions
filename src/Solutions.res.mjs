@@ -250,7 +250,25 @@ function colorCount(arr) {
               }));
 }
 
-var test = {
+function compareBlocks(a, b) {
+  var match = dimensions(a);
+  var match$1 = dimensions(b);
+  if (match[0] !== match$1[0] || match[1] !== match$1[1]) {
+    return false;
+  } else {
+    return Core__Array.reduceWithIndex(a, true, (function (acc, row, i) {
+                  return Core__Array.reduceWithIndex(row, acc, (function (acc2, el, j) {
+                                if (acc2) {
+                                  return Caml_obj.equal(el, b[i][j]);
+                                } else {
+                                  return false;
+                                }
+                              }));
+                }));
+  }
+}
+
+var testRaw = {
   input: [
     [
       1,
@@ -590,48 +608,13 @@ var test = {
   ]
 };
 
-function compareBlocks(a, b) {
-  var match = dimensions(a);
-  var match$1 = dimensions(b);
-  if (match[0] !== match$1[0] || match[1] !== match$1[1]) {
-    return false;
-  } else {
-    return Core__Array.reduceWithIndex(a, true, (function (acc, row, i) {
-                  return Core__Array.reduceWithIndex(row, acc, (function (acc2, el, j) {
-                                if (acc2) {
-                                  return Caml_obj.equal(el, b[i][j]);
-                                } else {
-                                  return false;
-                                }
-                              }));
-                }));
-  }
-}
+var test_input = toColors(testRaw.input);
 
-function Solutions$Grid(props) {
-  return JsxRuntime.jsx("div", {
-              children: JsxRuntime.jsx("div", {
-                    children: props.block.map(function (row) {
-                          return JsxRuntime.jsx("div", {
-                                      children: row.map(function (el) {
-                                            return JsxRuntime.jsx("div", {
-                                                        className: "w-5 h-5",
-                                                        style: {
-                                                          backgroundColor: colorToHex(el)
-                                                        }
-                                                      });
-                                          }),
-                                      className: "flex flex-col gap-px"
-                                    });
-                        }),
-                    className: "flex flex-row gap-px bg-gray-500 w-fit "
-                  }),
-              className: "p-2 "
-            });
-}
+var test_output = toColors(testRaw.output);
 
-var Grid = {
-  make: Solutions$Grid
+var test = {
+  input: test_input,
+  output: test_output
 };
 
 function main(input) {
@@ -659,12 +642,44 @@ function main(input) {
               }));
 }
 
-function Solutions$Main_0b148d64(props) {
-  var output = main(toColors(test.input));
+var output = main(test_input);
+
+var Solution_0b148d64 = {
+  test: test,
+  output: output
+};
+
+function Solutions$Grid(props) {
+  return JsxRuntime.jsx("div", {
+              children: JsxRuntime.jsx("div", {
+                    children: props.block.map(function (row) {
+                          return JsxRuntime.jsx("div", {
+                                      children: row.map(function (el) {
+                                            return JsxRuntime.jsx("div", {
+                                                        className: "w-5 h-5",
+                                                        style: {
+                                                          backgroundColor: colorToHex(el)
+                                                        }
+                                                      });
+                                          }),
+                                      className: "flex flex-col gap-px"
+                                    });
+                        }),
+                    className: "flex flex-row gap-px bg-gray-500 w-fit "
+                  }),
+              className: "p-2 "
+            });
+}
+
+var Grid = {
+  make: Solutions$Grid
+};
+
+function Solutions(props) {
   return JsxRuntime.jsxs("div", {
               children: [
                 JsxRuntime.jsx(Solutions$Grid, {
-                      block: toColors(test.input)
+                      block: test_input
                     }),
                 Core__Option.mapOr(output, null, (function (output_) {
                         return JsxRuntime.jsxs("div", {
@@ -673,10 +688,10 @@ function Solutions$Main_0b148d64(props) {
                                             block: output_
                                           }),
                                       JsxRuntime.jsx(Solutions$Grid, {
-                                            block: toColors(test.output)
+                                            block: test_output
                                           }),
                                       JsxRuntime.jsx("div", {
-                                            children: compareBlocks(output_, toColors(test.output)) ? "Solved!" : "Unsolved",
+                                            children: compareBlocks(output_, test_output) ? "Solved!" : "Unsolved",
                                             className: "p-2 font-black text-xl"
                                           })
                                     ]
@@ -687,10 +702,9 @@ function Solutions$Main_0b148d64(props) {
             });
 }
 
-var Main_0b148d64 = {
-  main: main,
-  make: Solutions$Main_0b148d64
-};
+var Solution;
+
+var make = Solutions;
 
 export {
   keepMapWithIndex ,
@@ -712,9 +726,10 @@ export {
   carve ,
   blocksNonBlackColor ,
   colorCount ,
-  test ,
   compareBlocks ,
+  Solution_0b148d64 ,
   Grid ,
-  Main_0b148d64 ,
+  Solution ,
+  make ,
 }
-/* react/jsx-runtime Not a pure module */
+/* test Not a pure module */

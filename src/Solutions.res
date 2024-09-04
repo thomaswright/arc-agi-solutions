@@ -144,34 +144,6 @@ let colorCount = arr =>
     )
   )
 
-let test = {
-  "input": [
-    [1, 1, 1, 1, 0, 1, 0, 0, 3, 0, 3, 3, 3, 3, 3, 3, 0],
-    [1, 0, 1, 0, 1, 1, 0, 0, 0, 3, 0, 3, 3, 3, 0, 0, 0],
-    [1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 0, 0],
-    [0, 0, 0, 1, 1, 1, 0, 0, 3, 3, 0, 3, 3, 0, 3, 0, 0],
-    [1, 1, 1, 1, 1, 1, 0, 0, 0, 3, 0, 3, 3, 3, 0, 3, 3],
-    [1, 1, 1, 1, 1, 1, 0, 0, 3, 3, 0, 0, 0, 3, 0, 0, 3],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [3, 0, 0, 0, 0, 3, 0, 0, 3, 3, 3, 0, 3, 0, 3, 0, 3],
-    [0, 3, 3, 0, 0, 3, 0, 0, 0, 3, 0, 3, 3, 3, 0, 0, 0],
-    [3, 3, 3, 3, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 3],
-    [3, 0, 3, 0, 3, 0, 0, 0, 0, 3, 3, 3, 3, 3, 3, 0, 3],
-    [0, 3, 3, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 0, 3, 3, 0],
-  ],
-  "output": [
-    [1, 1, 1, 1, 0, 1],
-    [1, 0, 1, 0, 1, 1],
-    [1, 1, 0, 1, 1, 0],
-    [0, 0, 0, 1, 1, 1],
-    [1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 1, 1],
-  ],
-}
-
 let compareBlocks = (a, b) => {
   let (ax, ay) = a->dimensions
   let (bx, by) = b->dimensions
@@ -185,34 +157,48 @@ let compareBlocks = (a, b) => {
     })
   }
 }
-
-module Grid = {
-  @react.component
-  let make = (~block) => {
-    <div className="p-2 ">
-      <div className="flex flex-row gap-px bg-gray-500 w-fit ">
-        {block
-        ->Array.map(row => {
-          <div className="flex flex-col gap-px">
-            {row
-            ->Array.map(el => {
-              <div
-                style={{
-                  backgroundColor: el->colorToHex,
-                }}
-                className="w-5 h-5"
-              />
-            })
-            ->React.array}
-          </div>
-        })
-        ->React.array}
-      </div>
-    </div>
-  }
+type block = array<array<color>>
+type test = {
+  input: block,
+  output: block,
+}
+module type Puzz = {
+  let test: test
+  let output: option<block>
 }
 
-module Main_0b148d64 = {
+module Solution_0b148d64: Puzz = {
+  let testRaw = {
+    "input": [
+      [1, 1, 1, 1, 0, 1, 0, 0, 3, 0, 3, 3, 3, 3, 3, 3, 0],
+      [1, 0, 1, 0, 1, 1, 0, 0, 0, 3, 0, 3, 3, 3, 0, 0, 0],
+      [1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 0, 0],
+      [0, 0, 0, 1, 1, 1, 0, 0, 3, 3, 0, 3, 3, 0, 3, 0, 0],
+      [1, 1, 1, 1, 1, 1, 0, 0, 0, 3, 0, 3, 3, 3, 0, 3, 3],
+      [1, 1, 1, 1, 1, 1, 0, 0, 3, 3, 0, 0, 0, 3, 0, 0, 3],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [3, 0, 0, 0, 0, 3, 0, 0, 3, 3, 3, 0, 3, 0, 3, 0, 3],
+      [0, 3, 3, 0, 0, 3, 0, 0, 0, 3, 0, 3, 3, 3, 0, 0, 0],
+      [3, 3, 3, 3, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 3],
+      [3, 0, 3, 0, 3, 0, 0, 0, 0, 3, 3, 3, 3, 3, 3, 0, 3],
+      [0, 3, 3, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 0, 3, 3, 0],
+    ],
+    "output": [
+      [1, 1, 1, 1, 0, 1],
+      [1, 0, 1, 0, 1, 1],
+      [1, 1, 0, 1, 1, 0],
+      [0, 0, 0, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1],
+    ],
+  }
+  let test = {
+    input: testRaw["input"]->toColors,
+    output: testRaw["output"]->toColors,
+  }
   let main = input => {
     let blackRows = input->findLinesOfColor(Black)
     let blackColumns = input->transpose->findLinesOfColor(Black)
@@ -243,26 +229,48 @@ module Main_0b148d64 = {
 
     resultBlock
   }
+  let output = main(test.input)
+}
 
+module Grid = {
   @react.component
-  let make = () => {
-    let output = main(test["input"]->toColors)
-    // let testResult =
-    //   outputTest->Option.mapOr(false, output_ => compareBlocks(output_, test["output"]->toColors))
-    // Console.log(testResult)
-    <div className="flex flex-row">
-      <Grid block={test["input"]->toColors} />
-      {output->Option.mapOr(React.null, output_ =>
-        <div>
-          <Grid block={output_} />
-          <Grid block={test["output"]->toColors} />
-          <div className="p-2 font-black text-xl">
-            {(
-              compareBlocks(output_, test["output"]->toColors) ? "Solved!" : "Unsolved"
-            )->React.string}
+  let make = (~block) => {
+    <div className="p-2 ">
+      <div className="flex flex-row gap-px bg-gray-500 w-fit ">
+        {block
+        ->Array.map(row => {
+          <div className="flex flex-col gap-px">
+            {row
+            ->Array.map(el => {
+              <div
+                style={{
+                  backgroundColor: el->colorToHex,
+                }}
+                className="w-5 h-5"
+              />
+            })
+            ->React.array}
           </div>
-        </div>
-      )}
+        })
+        ->React.array}
+      </div>
     </div>
   }
+}
+
+module Solution = Solution_0b148d64
+@react.component
+let make = () => {
+  <div className="flex flex-row">
+    <Grid block={Solution.test.input} />
+    {Solution.output->Option.mapOr(React.null, output_ =>
+      <div>
+        <Grid block={output_} />
+        <Grid block={Solution.test.output} />
+        <div className="p-2 font-black text-xl">
+          {(compareBlocks(output_, Solution.test.output) ? "Solved!" : "Unsolved")->React.string}
+        </div>
+      </div>
+    )}
+  </div>
 }
