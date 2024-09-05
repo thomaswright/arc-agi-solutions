@@ -67,7 +67,7 @@ let make = () => {
   ]
 
   <div>
-    <div className="text-3xl font-black pb-4"> {"ARC-AGI"->React.string} </div>
+    <div className="text-3xl font-black pb-4"> {"ARC (non) AGI"->React.string} </div>
     <div className="flex flex-row gap-2">
       {solutions
       ->Array.map(({taskName}) => {
