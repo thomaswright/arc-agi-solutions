@@ -104,7 +104,15 @@ function Solutions(props) {
               children: [
                 JsxRuntime.jsx("div", {
                       children: "ARC (non) AGI",
-                      className: "text-3xl font-black pb-4"
+                      className: "text-3xl font-black pb-2"
+                    }),
+                JsxRuntime.jsx("div", {
+                      children: JsxRuntime.jsx("a", {
+                            children: "Github Repo",
+                            className: "text-blue-700 font-medium ",
+                            href: "https://github.com/thomaswright/arc-agi-solutions"
+                          }),
+                      className: "pb-4"
                     }),
                 JsxRuntime.jsx("div", {
                       children: solutions.map(function (param) {

@@ -67,7 +67,14 @@ let make = () => {
   ]
 
   <div>
-    <div className="text-3xl font-black pb-4"> {"ARC (non) AGI"->React.string} </div>
+    <div className="text-3xl font-black pb-2"> {"ARC (non) AGI"->React.string} </div>
+    <div className="pb-4">
+      <a
+        className="text-blue-700 font-medium "
+        href="https://github.com/thomaswright/arc-agi-solutions">
+        {"Github Repo"->React.string}
+      </a>
+    </div>
     <div className="flex flex-row gap-2">
       {solutions
       ->Array.map(({taskName}) => {
