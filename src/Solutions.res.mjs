@@ -103,7 +103,7 @@ function Solutions(props) {
   return JsxRuntime.jsxs("div", {
               children: [
                 JsxRuntime.jsx("div", {
-                      children: "ARC-AGI",
+                      children: "ARC (non) AGI",
                       className: "text-3xl font-black pb-4"
                     }),
                 JsxRuntime.jsx("div", {
