@@ -151,7 +151,7 @@ let main = (input: Common.block) => {
     ->Belt.Array.concatMany
     ->colorCount
     ->Belt.Map.String.toArray
-    ->Array.filter(((k, v)) => v == 4)
+    ->Array.filter(((_k, v)) => v == 4)
 
   let color = hasOnlyFour->Array.find(((color, _)) => {
     input
@@ -216,7 +216,7 @@ let main = (input: Common.block) => {
           let bottom = colorCoords->Array.find(c => c.x == t.x && c.y == maxY)
 
           switch (right, bottom) {
-          | (Some(r), Some(b)) =>
+          | (Some(_), Some(_)) =>
             blank(Black, maxX, maxY)
             ->adjustCol(l.y, _ => l.color)
             ->adjustRow(t.x, _ => t.color)
