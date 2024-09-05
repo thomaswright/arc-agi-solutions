@@ -296,13 +296,13 @@ let getByCoord = (input, (x, y)) => {
   })
 }
 
-let stepsToNext = (input: block, coord, color, (xStep, yStep)) => {
+let stepsToNext = (input: block, color, (xCoord, yCoord), (xStep, yStep)) => {
   let (maxX, maxY) = input->maxes
 
   let numSteps = ref(0)
   while {
-    let nextX = coord.x + xStep * numSteps.contents
-    let nextY = coord.y + yStep * numSteps.contents
+    let nextX = xCoord + xStep * numSteps.contents
+    let nextY = yCoord + yStep * numSteps.contents
     let nextCoord = input->getByCoord((nextX, nextY))
     nextCoord->Option.mapOr(false, nextCoord =>
       nextX >= 0 && nextX <= maxX && nextY >= 0 && nextY <= maxY && nextCoord != color
@@ -378,32 +378,45 @@ module Solution_4290ef0e = {
 
     let bgColor = bg->Array.getUnsafe(0)->Array.getUnsafe(0)->{x => x.color}
 
+    let getSizeAndArm = (corners, c, (xStep, yStep)) => {
+      let armR = input->stepsToNext(bgColor, (c.x, c.y), (xStep, 0))
+      let medianR = input->stepsToNext(c.color, (c.x + armR, c.y), (xStep, 0))
+
+      let armB = input->stepsToNext(bgColor, (c.x, c.y), (0, yStep))
+      let medianB = input->stepsToNext(c.color, (c.x, c.y + armB), (0, yStep))
+
+      if corners->Array.length > 0 {
+        let size = corners->Array.reduce(0, (acc, corner) => {
+          let corner_ = unwrapCorner(corner)
+          intMax(intMax(dist(corner_.x, c.x), dist(corner_.y, c.y)), acc)
+        })
+
+        (size, intMax(armR, armB))
+      } else if armR > armB {
+        (armR * 2 + medianR, armR)
+      } else {
+        {
+          (armB * 2 + medianB, armB)
+        }
+      }
+    }
+
     let measures = withCorners->Array.map(coords => {
       let corners = coords->getCorners
 
-      corners->Array.map(v => {
+      corners
+      ->Array.map(v => {
         switch v {
-        | TL(c) => {
-            let arm = input->stepsToNext(c, bgColor, (0, 1))
-
-            if corners->Array.length > 0 {
-              let size = corners->Array.reduce(
-                0,
-                (acc, corner) => {
-                  let corner_ = unwrapCorner(corner)
-                  intMax(intMax(dist(corner_.x, c.x), dist(corner_.y, c.y)), acc)
-                },
-              )
-            } else {
-              let size = 0
-            }
-            // measure right
-
-            // measure down
-          }
-        | TR(c) => ()
-        | BL(c) => ()
-        | BR(c) => ()
+        | TL(c) => getSizeAndArm(corners, c, (1, 1))
+        | TR(c) => getSizeAndArm(corners, c, (-1, 1))
+        | BL(c) => getSizeAndArm(corners, c, (1, -1))
+        | BR(c) => getSizeAndArm(corners, c, (-1, -1))
+        }
+      })
+      ->Array.reduce(None, (acc, (size, arm)) => {
+        switch acc {
+        | None => Some((size, arm))
+        | Some((s, a)) => Some(size > s ? (size, arm) : (s, a))
         }
       })
     })

@@ -492,16 +492,18 @@ function getByCoord(input, param) {
               }));
 }
 
-function stepsToNext(input, coord, color, param) {
-  var yStep = param[1];
-  var xStep = param[0];
+function stepsToNext(input, color, param, param$1) {
+  var yStep = param$1[1];
+  var xStep = param$1[0];
+  var yCoord = param[1];
+  var xCoord = param[0];
   var match = maxes(input);
   var maxY = match[1];
   var maxX = match[0];
   var numSteps = 0;
   while((function () {
-          var nextX = coord.x + Math.imul(xStep, numSteps) | 0;
-          var nextY = coord.y + Math.imul(yStep, numSteps) | 0;
+          var nextX = xCoord + Math.imul(xStep, numSteps) | 0;
+          var nextY = yCoord + Math.imul(yStep, numSteps) | 0;
           var nextCoord = getByCoord(input, [
                 nextX,
                 nextY
@@ -1090,26 +1092,103 @@ function main(input) {
           return getCorners(box).length > 0;
         }));
   var bgColor = match$1[1][0][0].color;
+  var getSizeAndArm = function (corners, c, param) {
+    var yStep = param[1];
+    var xStep = param[0];
+    var armR = stepsToNext(input, bgColor, [
+          c.x,
+          c.y
+        ], [
+          xStep,
+          0
+        ]);
+    var medianR = stepsToNext(input, c.color, [
+          c.x + armR | 0,
+          c.y
+        ], [
+          xStep,
+          0
+        ]);
+    var armB = stepsToNext(input, bgColor, [
+          c.x,
+          c.y
+        ], [
+          0,
+          yStep
+        ]);
+    var medianB = stepsToNext(input, c.color, [
+          c.x,
+          c.y + armB | 0
+        ], [
+          0,
+          yStep
+        ]);
+    if (corners.length <= 0) {
+      if (armR > armB) {
+        return [
+                (armR << 1) + medianR | 0,
+                armR
+              ];
+      } else {
+        return [
+                (armB << 1) + medianB | 0,
+                armB
+              ];
+      }
+    }
+    var size = Core__Array.reduce(corners, 0, (function (acc, corner) {
+            var corner_ = corner._0;
+            return intMax(intMax(dist(corner_.x, c.x), dist(corner_.y, c.y)), acc);
+          }));
+    return [
+            size,
+            intMax(armR, armB)
+          ];
+  };
   match$1[0].map(function (coords) {
         var corners = getCorners(coords);
-        return corners.map(function (v) {
-                    if (v.TAG !== "TL") {
-                      return ;
-                    }
-                    var c = v._0;
-                    stepsToNext(input, c, bgColor, [
-                          0,
-                          1
-                        ]);
-                    if (corners.length > 0) {
-                      Core__Array.reduce(corners, 0, (function (acc, corner) {
-                              var corner_ = corner._0;
-                              return intMax(intMax(dist(corner_.x, c.x), dist(corner_.y, c.y)), acc);
-                            }));
-                      return ;
-                    }
-                    
-                  });
+        return Core__Array.reduce(corners.map(function (v) {
+                        switch (v.TAG) {
+                          case "TL" :
+                              return getSizeAndArm(corners, v._0, [
+                                          1,
+                                          1
+                                        ]);
+                          case "TR" :
+                              return getSizeAndArm(corners, v._0, [
+                                          -1,
+                                          1
+                                        ]);
+                          case "BL" :
+                              return getSizeAndArm(corners, v._0, [
+                                          1,
+                                          -1
+                                        ]);
+                          case "BR" :
+                              return getSizeAndArm(corners, v._0, [
+                                          -1,
+                                          -1
+                                        ]);
+                          
+                        }
+                      }), undefined, (function (acc, param) {
+                      var arm = param[1];
+                      var size = param[0];
+                      if (acc === undefined) {
+                        return [
+                                size,
+                                arm
+                              ];
+                      }
+                      var s = acc[0];
+                      return size > s ? [
+                                size,
+                                arm
+                              ] : [
+                                s,
+                                acc[1]
+                              ];
+                    }));
       });
 }
 
