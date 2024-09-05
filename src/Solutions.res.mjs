@@ -397,7 +397,7 @@ function isAt(a, b, param) {
   }
 }
 
-function isAEvery(coords, a, arr) {
+function isAtEvery(coords, a, arr) {
   return arr.every(function (v) {
               return coords.some(function (b) {
                           return isAt(a, b, v);
@@ -407,7 +407,7 @@ function isAEvery(coords, a, arr) {
 
 function getCorners(coords) {
   return Belt_Array.keepMap(coords, (function (a) {
-                if (isAEvery(coords, a, [
+                if (isAtEvery(coords, a, [
                         [
                           0,
                           1
@@ -418,30 +418,16 @@ function getCorners(coords) {
                         ]
                       ])) {
                   return {
-                          TAG: "TR",
+                          TAG: "BL",
                           _0: a
                         };
-                } else if (isAEvery(coords, a, [
+                } else if (isAtEvery(coords, a, [
                         [
                           0,
                           1
                         ],
                         [
                           1,
-                          0
-                        ]
-                      ])) {
-                  return {
-                          TAG: "TL",
-                          _0: a
-                        };
-                } else if (isAEvery(coords, a, [
-                        [
-                          0,
-                          -1
-                        ],
-                        [
-                          -1,
                           0
                         ]
                       ])) {
@@ -449,7 +435,21 @@ function getCorners(coords) {
                           TAG: "BR",
                           _0: a
                         };
-                } else if (isAEvery(coords, a, [
+                } else if (isAtEvery(coords, a, [
+                        [
+                          0,
+                          -1
+                        ],
+                        [
+                          -1,
+                          0
+                        ]
+                      ])) {
+                  return {
+                          TAG: "TL",
+                          _0: a
+                        };
+                } else if (isAtEvery(coords, a, [
                         [
                           0,
                           -1
@@ -460,7 +460,7 @@ function getCorners(coords) {
                         ]
                       ])) {
                   return {
-                          TAG: "BL",
+                          TAG: "TR",
                           _0: a
                         };
                 } else {
@@ -519,6 +519,40 @@ function stepsToNext(input, color, param, param$1) {
     numSteps = numSteps + 1 | 0;
   };
   return numSteps;
+}
+
+function between(v, a, b) {
+  if (Caml_obj.greaterthan(a, b)) {
+    if (Caml_obj.greaterthan(v, b)) {
+      return Caml_obj.lessequal(v, a);
+    } else {
+      return false;
+    }
+  } else if (Caml_obj.lessthan(a, b)) {
+    if (Caml_obj.greaterequal(v, a)) {
+      return Caml_obj.lessthan(v, b);
+    } else {
+      return false;
+    }
+  } else {
+    return Caml_obj.equal(v, a);
+  }
+}
+
+function adjustRel(input, f, param, param$1) {
+  var relY = param$1[1];
+  var relX = param$1[0];
+  var coordY = param[1];
+  var coordX = param[0];
+  return input.map(function (row, i) {
+              return row.map(function (el, j) {
+                          if (between(i, coordX, coordX + relX | 0) && between(j, coordY, coordY + relY | 0)) {
+                            return f(el);
+                          } else {
+                            return el;
+                          }
+                        });
+            });
 }
 
 var testRaw = {
@@ -1070,6 +1104,516 @@ var testRaw = {
   ]
 };
 
+var testRaw2 = {
+  input: [
+    [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3
+    ],
+    [
+      2,
+      2,
+      2,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3
+    ],
+    [
+      3,
+      3,
+      2,
+      3,
+      3,
+      1,
+      1,
+      1,
+      3,
+      3,
+      3,
+      1,
+      1,
+      1,
+      3,
+      8,
+      8,
+      3
+    ],
+    [
+      3,
+      3,
+      2,
+      3,
+      3,
+      1,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      1,
+      3,
+      8,
+      3,
+      3
+    ],
+    [
+      3,
+      3,
+      3,
+      3,
+      3,
+      1,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      1,
+      3,
+      3,
+      3,
+      3
+    ],
+    [
+      3,
+      3,
+      2,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      8,
+      3,
+      3
+    ],
+    [
+      3,
+      3,
+      2,
+      3,
+      3,
+      3,
+      3,
+      7,
+      7,
+      7,
+      3,
+      3,
+      3,
+      3,
+      3,
+      8,
+      8,
+      3
+    ],
+    [
+      2,
+      2,
+      2,
+      3,
+      3,
+      3,
+      3,
+      7,
+      3,
+      7,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3
+    ],
+    [
+      3,
+      3,
+      3,
+      3,
+      3,
+      1,
+      3,
+      7,
+      7,
+      7,
+      3,
+      3,
+      3,
+      1,
+      3,
+      3,
+      3,
+      3
+    ],
+    [
+      3,
+      3,
+      3,
+      3,
+      3,
+      1,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      1,
+      3,
+      3,
+      3,
+      3
+    ],
+    [
+      3,
+      3,
+      3,
+      3,
+      3,
+      1,
+      1,
+      1,
+      3,
+      3,
+      3,
+      1,
+      1,
+      1,
+      3,
+      3,
+      3,
+      3
+    ],
+    [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3
+    ],
+    [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3
+    ],
+    [
+      3,
+      3,
+      3,
+      4,
+      4,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      4,
+      4,
+      3,
+      3,
+      3,
+      3
+    ],
+    [
+      3,
+      3,
+      3,
+      4,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      4,
+      3,
+      3,
+      3,
+      3
+    ],
+    [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3
+    ],
+    [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      6,
+      3
+    ],
+    [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3
+    ]
+  ],
+  output: [
+    [
+      4,
+      4,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      4,
+      4
+    ],
+    [
+      4,
+      1,
+      1,
+      1,
+      3,
+      3,
+      3,
+      1,
+      1,
+      1,
+      4
+    ],
+    [
+      3,
+      1,
+      2,
+      2,
+      2,
+      3,
+      2,
+      2,
+      2,
+      1,
+      3
+    ],
+    [
+      3,
+      1,
+      2,
+      8,
+      8,
+      3,
+      8,
+      8,
+      2,
+      1,
+      3
+    ],
+    [
+      3,
+      3,
+      2,
+      8,
+      7,
+      7,
+      7,
+      8,
+      2,
+      3,
+      3
+    ],
+    [
+      3,
+      3,
+      3,
+      3,
+      7,
+      6,
+      7,
+      3,
+      3,
+      3,
+      3
+    ],
+    [
+      3,
+      3,
+      2,
+      8,
+      7,
+      7,
+      7,
+      8,
+      2,
+      3,
+      3
+    ],
+    [
+      3,
+      1,
+      2,
+      8,
+      8,
+      3,
+      8,
+      8,
+      2,
+      1,
+      3
+    ],
+    [
+      3,
+      1,
+      2,
+      2,
+      2,
+      3,
+      2,
+      2,
+      2,
+      1,
+      3
+    ],
+    [
+      4,
+      1,
+      1,
+      1,
+      3,
+      3,
+      3,
+      1,
+      1,
+      1,
+      4
+    ],
+    [
+      4,
+      4,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      4,
+      4
+    ]
+  ]
+};
+
 var test_input = toColors(testRaw.input);
 
 var test_output = toColors(testRaw.output);
@@ -1088,51 +1632,53 @@ function main(input) {
   var match = Belt_Array.partition(colorGroups, (function (v) {
           return v.length === 1;
         }));
-  var match$1 = Belt_Array.partition(match[1], (function (box) {
-          return getCorners(box).length > 0;
-        }));
-  var bgColor = match$1[1][0][0].color;
+  var singleCoord = match[0];
+  var sortedBoxes = match[1].toSorted(function (a, b) {
+        return b.length - a.length | 0;
+      });
+  var withCorners = sortedBoxes.slice(1);
+  var bgColor = sortedBoxes[0][0].color;
   var getSizeAndArm = function (corners, c, param) {
     var yStep = param[1];
     var xStep = param[0];
-    var armR = stepsToNext(input, bgColor, [
+    var armX = stepsToNext(input, bgColor, [
           c.x,
           c.y
         ], [
           xStep,
           0
         ]);
-    var medianR = stepsToNext(input, c.color, [
-          c.x + armR | 0,
+    var medianX = stepsToNext(input, c.color, [
+          c.x + armX | 0,
           c.y
         ], [
           xStep,
           0
         ]);
-    var armB = stepsToNext(input, bgColor, [
+    var armY = stepsToNext(input, bgColor, [
           c.x,
           c.y
         ], [
           0,
           yStep
         ]);
-    var medianB = stepsToNext(input, c.color, [
+    var medianY = stepsToNext(input, c.color, [
           c.x,
-          c.y + armB | 0
+          c.y + armY | 0
         ], [
           0,
           yStep
         ]);
-    if (corners.length <= 0) {
-      if (armR > armB) {
+    if (corners.length <= 1) {
+      if ((armX + medianX | 0) > (armY + medianY | 0)) {
         return [
-                (armR << 1) + medianR | 0,
-                armR
+                (armY << 1) + medianY | 0,
+                armY
               ];
       } else {
         return [
-                (armB << 1) + medianB | 0,
-                armB
+                (armX << 1) + medianX | 0,
+                armX
               ];
       }
     }
@@ -1142,60 +1688,164 @@ function main(input) {
           }));
     return [
             size,
-            intMax(armR, armB)
+            intMax(armX, armY)
           ];
   };
-  match$1[0].map(function (coords) {
-        var corners = getCorners(coords);
-        return Core__Array.reduce(corners.map(function (v) {
-                        switch (v.TAG) {
-                          case "TL" :
-                              return getSizeAndArm(corners, v._0, [
-                                          1,
-                                          1
-                                        ]);
-                          case "TR" :
-                              return getSizeAndArm(corners, v._0, [
-                                          -1,
-                                          1
-                                        ]);
-                          case "BL" :
-                              return getSizeAndArm(corners, v._0, [
-                                          1,
-                                          -1
-                                        ]);
-                          case "BR" :
-                              return getSizeAndArm(corners, v._0, [
-                                          -1,
-                                          -1
-                                        ]);
-                          
-                        }
-                      }), undefined, (function (acc, param) {
-                      var arm = param[1];
-                      var size = param[0];
-                      if (acc === undefined) {
-                        return [
-                                size,
-                                arm
-                              ];
-                      }
-                      var s = acc[0];
-                      return size > s ? [
-                                size,
-                                arm
-                              ] : [
-                                s,
-                                acc[1]
-                              ];
-                    }));
+  var measures = Belt_Array.keepMap(withCorners.map(function (coords) {
+              var corners = getCorners(coords);
+              var color = coords[0].color;
+              return Core__Option.map(Core__Array.reduce(corners.map(function (v) {
+                                  switch (v.TAG) {
+                                    case "TL" :
+                                        return getSizeAndArm(corners, v._0, [
+                                                    1,
+                                                    1
+                                                  ]);
+                                    case "TR" :
+                                        return getSizeAndArm(corners, v._0, [
+                                                    -1,
+                                                    1
+                                                  ]);
+                                    case "BL" :
+                                        return getSizeAndArm(corners, v._0, [
+                                                    1,
+                                                    -1
+                                                  ]);
+                                    case "BR" :
+                                        return getSizeAndArm(corners, v._0, [
+                                                    -1,
+                                                    -1
+                                                  ]);
+                                    
+                                  }
+                                }), undefined, (function (acc, param) {
+                                var arm = param[1];
+                                var size = param[0];
+                                if (acc === undefined) {
+                                  return [
+                                          size,
+                                          arm
+                                        ];
+                                }
+                                var s = acc[0];
+                                return size > s ? [
+                                          size,
+                                          arm
+                                        ] : [
+                                          s,
+                                          acc[1]
+                                        ];
+                              })), (function (v) {
+                            return [
+                                    color,
+                                    v
+                                  ];
+                          }));
+            }), (function (x) {
+            return x;
+          })).toSorted(function (param, param$1) {
+        return param$1[1][0] - param[1][0] | 0;
       });
+  var blankSize = (function (param) {
+        return param[1][0];
+      })(measures[0]);
+  var adjustment = blankSize % 2;
+  var singleAdjustment = function (a) {
+    return Core__Option.mapOr(Core__Option.flatMap(singleCoord[0], (function (v) {
+                      return v[0];
+                    })), a, (function (param) {
+                  var color = param.color;
+                  return adjustRel(a, (function (param) {
+                                return color;
+                              }), [
+                              (blankSize - adjustment | 0) / 2 | 0,
+                              (blankSize - adjustment | 0) / 2 | 0
+                            ], [
+                              0,
+                              0
+                            ]);
+                }));
+  };
+  return Core__Array.reduce(measures, singleAdjustment(blank(bgColor, blankSize - adjustment | 0, blankSize - adjustment | 0)), (function (acc, param) {
+                var match = param[1];
+                var arm = match[1];
+                var size = match[0];
+                var color = param[0];
+                var i = size - size % 2 | 0;
+                var os = (blankSize - size | 0) / 2 | 0;
+                return adjustRel(adjustRel(adjustRel(adjustRel(adjustRel(adjustRel(adjustRel(adjustRel(acc, (function (param) {
+                                                          return color;
+                                                        }), [
+                                                        os,
+                                                        os
+                                                      ], [
+                                                        arm,
+                                                        0
+                                                      ]), (function (param) {
+                                                      return color;
+                                                    }), [
+                                                    os,
+                                                    os
+                                                  ], [
+                                                    0,
+                                                    arm
+                                                  ]), (function (param) {
+                                                  return color;
+                                                }), [
+                                                os + i | 0,
+                                                os
+                                              ], [
+                                                -arm | 0,
+                                                0
+                                              ]), (function (param) {
+                                              return color;
+                                            }), [
+                                            os + i | 0,
+                                            os
+                                          ], [
+                                            0,
+                                            arm
+                                          ]), (function (param) {
+                                          return color;
+                                        }), [
+                                        os,
+                                        os + i | 0
+                                      ], [
+                                        arm,
+                                        0
+                                      ]), (function (param) {
+                                      return color;
+                                    }), [
+                                    os,
+                                    os + i | 0
+                                  ], [
+                                    0,
+                                    -arm | 0
+                                  ]), (function (param) {
+                                  return color;
+                                }), [
+                                os + i | 0,
+                                os + i | 0
+                              ], [
+                                -arm | 0,
+                                0
+                              ]), (function (param) {
+                              return color;
+                            }), [
+                            os + i | 0,
+                            os + i | 0
+                          ], [
+                            0,
+                            -arm | 0
+                          ]);
+              }));
 }
 
 var output = main(test_input);
 
 var Solution_4290ef0e = {
   testRaw: testRaw,
+  testRaw2: testRaw2,
   test: test,
   main: main,
   output: output
@@ -2335,10 +2985,10 @@ function Solutions$Grid(props) {
                                                         }
                                                       });
                                           }),
-                                      className: "flex flex-row gap-px"
+                                      className: "flex flex-col gap-px"
                                     });
                         }),
-                    className: "flex flex-col gap-px bg-gray-600 w-fit "
+                    className: "flex flex-row gap-px bg-gray-600 w-fit "
                   }),
               className: "p-2 "
             });
@@ -2352,19 +3002,19 @@ function Solutions(props) {
   return JsxRuntime.jsxs("div", {
               children: [
                 JsxRuntime.jsx(Solutions$Grid, {
-                      block: test_input$1
+                      block: test_input
                     }),
-                Core__Option.mapOr(output$1, null, (function (output_) {
+                Core__Option.mapOr(output, null, (function (output_) {
                         return JsxRuntime.jsxs("div", {
                                     children: [
                                       JsxRuntime.jsx(Solutions$Grid, {
                                             block: output_
                                           }),
                                       JsxRuntime.jsx(Solutions$Grid, {
-                                            block: test_output$1
+                                            block: test_output
                                           }),
                                       JsxRuntime.jsx("div", {
-                                            children: compareBlocks(output_, test_output$1) ? "Solved!" : "Unsolved",
+                                            children: compareBlocks(output_, test_output) ? "Solved!" : "Unsolved",
                                             className: "p-2 font-black text-xl"
                                           })
                                     ]
@@ -2410,13 +3060,15 @@ export {
   adjustRow ,
   adjustCol ,
   isAt ,
-  isAEvery ,
+  isAtEvery ,
   getCorners ,
   unwrapCorner ,
   intMax ,
   dist ,
   getByCoord ,
   stepsToNext ,
+  between ,
+  adjustRel ,
   Solution_4290ef0e ,
   Solution_0b148d64 ,
   Solution_6cdd2623 ,

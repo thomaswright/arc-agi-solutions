@@ -249,7 +249,7 @@ type corners = TL(coord) | TR(coord) | BL(coord) | BR(coord)
 let isAt = (a, b, (x, y)) => {
   a.x - x == b.x && a.y - y == b.y
 }
-let isAEvery = (coords, a, arr) => {
+let isAtEvery = (coords, a, arr) => {
   arr->Array.every(v => {
     coords->Array.some(b => {
       isAt(a, b, v)
@@ -259,14 +259,14 @@ let isAEvery = (coords, a, arr) => {
 
 let getCorners = coords => {
   coords->Belt.Array.keepMap(a => {
-    if coords->isAEvery(a, [(0, 1), (-1, 0)]) {
-      Some(TR(a))
-    } else if coords->isAEvery(a, [(0, 1), (1, 0)]) {
-      Some(TL(a))
-    } else if coords->isAEvery(a, [(0, -1), (-1, 0)]) {
-      Some(BR(a))
-    } else if coords->isAEvery(a, [(0, -1), (1, 0)]) {
+    if coords->isAtEvery(a, [(0, 1), (-1, 0)]) {
       Some(BL(a))
+    } else if coords->isAtEvery(a, [(0, 1), (1, 0)]) {
+      Some(BR(a))
+    } else if coords->isAtEvery(a, [(0, -1), (-1, 0)]) {
+      Some(TL(a))
+    } else if coords->isAtEvery(a, [(0, -1), (1, 0)]) {
+      Some(TR(a))
     } else {
       None
     }
@@ -313,6 +313,27 @@ let stepsToNext = (input: block, color, (xCoord, yCoord), (xStep, yStep)) => {
   numSteps.contents
 }
 
+let between = (v, a, b) => {
+  if a > b {
+    v > b && v <= a
+  } else if a < b {
+    v >= a && v < b
+  } else {
+    v == a
+  }
+}
+let adjustRel = (input, f, (coordX, coordY), (relX, relY)) => {
+  input->Array.mapWithIndex((row, i) =>
+    row->Array.mapWithIndex((el, j) => {
+      if i->between(coordX, coordX + relX) && j->between(coordY, coordY + relY) {
+        f(el)
+      } else {
+        el
+      }
+    })
+  )
+}
+
 module Solution_4290ef0e = {
   let testRaw = {
     "input": [
@@ -350,6 +371,42 @@ module Solution_4290ef0e = {
       [4, 4, 4, 4, 4, 1, 4, 4, 4, 4, 4],
     ],
   }
+  let testRaw2 = {
+    "input": [
+      [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+      [2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+      [3, 3, 2, 3, 3, 1, 1, 1, 3, 3, 3, 1, 1, 1, 3, 8, 8, 3],
+      [3, 3, 2, 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 1, 3, 8, 3, 3],
+      [3, 3, 3, 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 3, 3],
+      [3, 3, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 8, 3, 3],
+      [3, 3, 2, 3, 3, 3, 3, 7, 7, 7, 3, 3, 3, 3, 3, 8, 8, 3],
+      [2, 2, 2, 3, 3, 3, 3, 7, 3, 7, 3, 3, 3, 3, 3, 3, 3, 3],
+      [3, 3, 3, 3, 3, 1, 3, 7, 7, 7, 3, 3, 3, 1, 3, 3, 3, 3],
+      [3, 3, 3, 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 3, 3],
+      [3, 3, 3, 3, 3, 1, 1, 1, 3, 3, 3, 1, 1, 1, 3, 3, 3, 3],
+      [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+      [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+      [3, 3, 3, 4, 4, 3, 3, 3, 3, 3, 3, 3, 4, 4, 3, 3, 3, 3],
+      [3, 3, 3, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 3, 3, 3, 3],
+      [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+      [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 6, 3],
+      [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+    ],
+    "output": [
+      [4, 4, 3, 3, 3, 3, 3, 3, 3, 4, 4],
+      [4, 1, 1, 1, 3, 3, 3, 1, 1, 1, 4],
+      [3, 1, 2, 2, 2, 3, 2, 2, 2, 1, 3],
+      [3, 1, 2, 8, 8, 3, 8, 8, 2, 1, 3],
+      [3, 3, 2, 8, 7, 7, 7, 8, 2, 3, 3],
+      [3, 3, 3, 3, 7, 6, 7, 3, 3, 3, 3],
+      [3, 3, 2, 8, 7, 7, 7, 8, 2, 3, 3],
+      [3, 1, 2, 8, 8, 3, 8, 8, 2, 1, 3],
+      [3, 1, 2, 2, 2, 3, 2, 2, 2, 1, 3],
+      [4, 1, 1, 1, 3, 3, 3, 1, 1, 1, 4],
+      [4, 4, 3, 3, 3, 3, 3, 3, 3, 4, 4],
+    ],
+  }
+
   let test = {
     input: testRaw["input"]->toColors,
     output: testRaw["output"]->toColors,
@@ -370,59 +427,102 @@ module Solution_4290ef0e = {
 
     let (singleCoord, boxes) = colorGroups->Belt.Array.partition(v => v->Array.length == 1)
 
-    let (withCorners, bg) = boxes->Belt.Array.partition(box => {
-      box
-      ->getCorners
-      ->Array.length > 0
-    })
+    // let (withCorners, bg) = boxes->Belt.Array.partition(box => {
+    //   box
+    //   ->getCorners
+    //   ->Array.length > 0
+    // })
 
-    let bgColor = bg->Array.getUnsafe(0)->Array.getUnsafe(0)->{x => x.color}
+    let sortedBoxes =
+      boxes->Array.toSorted((a, b) => (b->Array.length - a->Array.length)->Int.toFloat)
+
+    let withCorners = sortedBoxes->Array.sliceToEnd(~start=1)
+
+    let bgColor = sortedBoxes->Array.getUnsafe(0)->Array.getUnsafe(0)->{x => x.color}
 
     let getSizeAndArm = (corners, c, (xStep, yStep)) => {
-      let armR = input->stepsToNext(bgColor, (c.x, c.y), (xStep, 0))
-      let medianR = input->stepsToNext(c.color, (c.x + armR, c.y), (xStep, 0))
+      let armX = input->stepsToNext(bgColor, (c.x, c.y), (xStep, 0))
+      let medianX = input->stepsToNext(c.color, (c.x + armX, c.y), (xStep, 0))
 
-      let armB = input->stepsToNext(bgColor, (c.x, c.y), (0, yStep))
-      let medianB = input->stepsToNext(c.color, (c.x, c.y + armB), (0, yStep))
+      let armY = input->stepsToNext(bgColor, (c.x, c.y), (0, yStep))
+      let medianY = input->stepsToNext(c.color, (c.x, c.y + armY), (0, yStep))
 
-      if corners->Array.length > 0 {
+      if corners->Array.length > 1 {
         let size = corners->Array.reduce(0, (acc, corner) => {
           let corner_ = unwrapCorner(corner)
           intMax(intMax(dist(corner_.x, c.x), dist(corner_.y, c.y)), acc)
         })
 
-        (size, intMax(armR, armB))
-      } else if armR > armB {
-        (armR * 2 + medianR, armR)
+        (size, intMax(armX, armY))
+      } else if armX + medianX > armY + medianY {
+        (armY * 2 + medianY, armY)
       } else {
-        {
-          (armB * 2 + medianB, armB)
-        }
+        (armX * 2 + medianX, armX)
       }
     }
 
-    let measures = withCorners->Array.map(coords => {
-      let corners = coords->getCorners
+    let measures =
+      withCorners
+      ->Array.map(coords => {
+        let corners = coords->getCorners
+        let color = coords->Array.getUnsafe(0)->{x => x.color}
 
-      corners
-      ->Array.map(v => {
-        switch v {
-        | TL(c) => getSizeAndArm(corners, c, (1, 1))
-        | TR(c) => getSizeAndArm(corners, c, (-1, 1))
-        | BL(c) => getSizeAndArm(corners, c, (1, -1))
-        | BR(c) => getSizeAndArm(corners, c, (-1, -1))
-        }
+        corners
+        ->Array.map(v => {
+          switch v {
+          | TL(c) => getSizeAndArm(corners, c, (1, 1))
+          | TR(c) => getSizeAndArm(corners, c, (-1, 1))
+          | BL(c) => getSizeAndArm(corners, c, (1, -1))
+          | BR(c) => getSizeAndArm(corners, c, (-1, -1))
+          }
+        })
+        ->Array.reduce(None, (acc, (size, arm)) => {
+          switch acc {
+          | None => Some((size, arm))
+          | Some((s, a)) => Some(size > s ? (size, arm) : (s, a))
+          }
+        })
+        ->Option.map(v => (color, v))
       })
-      ->Array.reduce(None, (acc, (size, arm)) => {
-        switch acc {
-        | None => Some((size, arm))
-        | Some((s, a)) => Some(size > s ? (size, arm) : (s, a))
-        }
+      ->Belt.Array.keepMap(x => x)
+      ->Array.toSorted(((_, (sizeA, _)), (_, (sizeB, _))) => (sizeB - sizeA)->Int.toFloat)
+
+    let blankSize = measures->Array.getUnsafe(0)->{((_, (size, _))) => size}
+    let adjustment = mod(blankSize, 2)
+
+    let singleAdjustment = a => {
+      singleCoord
+      ->Array.get(0)
+      ->Option.flatMap(v => v->Array.get(0))
+      ->Option.mapOr(a, ({color}) => {
+        a->adjustRel(
+          _ => color,
+          ((blankSize - adjustment) / 2, (blankSize - adjustment) / 2),
+          (0, 0),
+        )
       })
-    })
+    }
+
+    measures->Array.reduce(
+      blank(bgColor, blankSize - adjustment, blankSize - adjustment)->singleAdjustment,
+      (acc, (color, (size, arm))) => {
+        let i = size - mod(size, 2)
+        let os = (blankSize - size) / 2
+
+        acc
+        ->adjustRel(_ => color, (os, os), (arm, 0))
+        ->adjustRel(_ => color, (os, os), (0, arm))
+        ->adjustRel(_ => color, (os + i, os), (-arm, 0))
+        ->adjustRel(_ => color, (os + i, os), (0, arm))
+        ->adjustRel(_ => color, (os, os + i), (arm, 0))
+        ->adjustRel(_ => color, (os, os + i), (0, -arm))
+        ->adjustRel(_ => color, (os + i, os + i), (-arm, 0))
+        ->adjustRel(_ => color, (os + i, os + i), (0, -arm))
+      },
+    )
   }
 
-  let output = main(test.input)
+  let output = Some(main(test.input))
 }
 
 module Solution_0b148d64: Puzz = {
@@ -464,13 +564,7 @@ module Solution_0b148d64: Puzz = {
     let (maxX, maxY) = input->maxes
 
     let blockSpecs = getBlockSpecs(blackRows->converses(maxX), blackColumns->converses(maxY))
-    // Console.log5(
-    //   blackRows,
-    //   blackColumns,
-    //   blackRows->converses(numRows),
-    //   blackColumns->converses(numCols),
-    //   blockSpecs,
-    // )
+
     let blocks = carve(input, blockSpecs)
 
     let resultBlock =
@@ -634,10 +728,10 @@ module Grid = {
   @react.component
   let make = (~block) => {
     <div className="p-2 ">
-      <div className="flex flex-col gap-px bg-gray-600 w-fit ">
+      <div className="flex flex-row gap-px bg-gray-600 w-fit ">
         {block
         ->Array.map(row => {
-          <div className="flex flex-row gap-px">
+          <div className="flex flex-col gap-px">
             {row
             ->Array.map(el => {
               <div
@@ -656,7 +750,7 @@ module Grid = {
   }
 }
 
-module Solution = Solution_0b148d64
+module Solution = Solution_4290ef0e
 @react.component
 let make = () => {
   <div className="flex flex-row">
