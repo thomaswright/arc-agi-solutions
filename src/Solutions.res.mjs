@@ -47,6 +47,19 @@ function findLinesOfColor(full, color) {
               }));
 }
 
+var allColors = [
+  "Black",
+  "Blue",
+  "Red",
+  "Green",
+  "Yellow",
+  "Gray",
+  "Pink",
+  "Orange",
+  "Cyan",
+  "Brown"
+];
+
 function colorToString(color) {
   switch (color) {
     case "Black" :
@@ -70,6 +83,31 @@ function colorToString(color) {
     case "Brown" :
         return "Brown";
     
+  }
+}
+
+function stringToColor(color) {
+  switch (color) {
+    case "Blue" :
+        return "Blue";
+    case "Brown" :
+        return "Brown";
+    case "Cyan" :
+        return "Cyan";
+    case "Gray" :
+        return "Gray";
+    case "Green" :
+        return "Green";
+    case "Orange" :
+        return "Orange";
+    case "Pink" :
+        return "Pink";
+    case "Red" :
+        return "Red";
+    case "Yellow" :
+        return "Yellow";
+    default:
+      return "Black";
   }
 }
 
@@ -133,7 +171,7 @@ function toColors(arr) {
 }
 
 function range(max) {
-  return Core__Array.make(max, 0).map(function (param, i) {
+  return Core__Array.make(max + 1 | 0, 0).map(function (param, i) {
               return i;
             });
 }
@@ -179,10 +217,10 @@ function groups(rows) {
               }));
 }
 
-function dimensions(full) {
+function maxes(full) {
   return [
-          full.length,
-          transpose(full).length
+          full.length - 1 | 0,
+          transpose(full).length - 1 | 0
         ];
 }
 
@@ -251,8 +289,8 @@ function colorCount(arr) {
 }
 
 function compareBlocks(a, b) {
-  var match = dimensions(a);
-  var match$1 = dimensions(b);
+  var match = maxes(a);
+  var match$1 = maxes(b);
   if (match[0] !== match$1[0] || match[1] !== match$1[1]) {
     return false;
   } else {
@@ -268,7 +306,823 @@ function compareBlocks(a, b) {
   }
 }
 
+function isOnEdge(param, input) {
+  var y = param[1];
+  var x = param[0];
+  var match = maxes(input);
+  if (x === 0 || x === match[0] || y === 0) {
+    return true;
+  } else {
+    return y === match[1];
+  }
+}
+
+function keepMapAll(input, f) {
+  return Belt_Array.keepMap(Belt_Array.concatMany(input.map(function (row, i) {
+                      return row.map(function (el, j) {
+                                  return f(el, i, j);
+                                });
+                    })), (function (o) {
+                return o;
+              }));
+}
+
+function getCoordsOfColors(input, colors) {
+  return keepMapAll(input, (function (el, i, j) {
+                if (colors.includes(el)) {
+                  return {
+                          x: i,
+                          y: j,
+                          color: el
+                        };
+                }
+                
+              }));
+}
+
+function reduceSatAll(arr, fs) {
+  return Core__Array.reduce(arr, fs, (function (acc, arrEl) {
+                var $$break = {
+                  contents: false
+                };
+                return Core__Array.reduce(acc, [], (function (acc2, f) {
+                              if (f(arrEl) && !$$break.contents) {
+                                $$break.contents = true;
+                                return acc2;
+                              } else {
+                                return Belt_Array.concatMany([
+                                            acc2,
+                                            [f]
+                                          ]);
+                              }
+                            }));
+              })).length === 0;
+}
+
+function blank(color, x, y) {
+  return range(x).map(function (param) {
+              return range(y).map(function (param) {
+                          return color;
+                        });
+            });
+}
+
+function adjustRow(input, rowNum, f) {
+  return input.map(function (row, i) {
+              if (i === rowNum) {
+                return row.map(f);
+              } else {
+                return row;
+              }
+            });
+}
+
+function adjustCol(input, colNum, f) {
+  return input.map(function (row, i) {
+              return row.map(function (el, j) {
+                          if (j === colNum) {
+                            return f(el);
+                          } else {
+                            return el;
+                          }
+                        });
+            });
+}
+
+function isAt(a, b, param) {
+  if ((a.x - param[0] | 0) === b.x) {
+    return (a.y - param[1] | 0) === b.y;
+  } else {
+    return false;
+  }
+}
+
+function isAEvery(coords, a, arr) {
+  return arr.every(function (v) {
+              return coords.some(function (b) {
+                          return isAt(a, b, v);
+                        });
+            });
+}
+
+function getCorners(coords) {
+  return Belt_Array.keepMap(coords, (function (a) {
+                if (isAEvery(coords, a, [
+                        [
+                          0,
+                          1
+                        ],
+                        [
+                          -1,
+                          0
+                        ]
+                      ])) {
+                  return {
+                          TAG: "TR",
+                          _0: a
+                        };
+                } else if (isAEvery(coords, a, [
+                        [
+                          0,
+                          1
+                        ],
+                        [
+                          1,
+                          0
+                        ]
+                      ])) {
+                  return {
+                          TAG: "TL",
+                          _0: a
+                        };
+                } else if (isAEvery(coords, a, [
+                        [
+                          0,
+                          -1
+                        ],
+                        [
+                          -1,
+                          0
+                        ]
+                      ])) {
+                  return {
+                          TAG: "BR",
+                          _0: a
+                        };
+                } else if (isAEvery(coords, a, [
+                        [
+                          0,
+                          -1
+                        ],
+                        [
+                          1,
+                          0
+                        ]
+                      ])) {
+                  return {
+                          TAG: "BL",
+                          _0: a
+                        };
+                } else {
+                  return ;
+                }
+              }));
+}
+
+function unwrapCorner(c) {
+  return c._0;
+}
+
+function intMax(a, b) {
+  if (Caml_obj.greaterthan(a, b)) {
+    return a;
+  } else {
+    return b;
+  }
+}
+
+function dist(a, b) {
+  return intMax(a - b | 0, b - a | 0);
+}
+
+function getByCoord(input, param) {
+  var y = param[1];
+  return Core__Option.flatMap(input[param[0]], (function (row) {
+                return row[y];
+              }));
+}
+
+function stepsToNext(input, coord, color, param) {
+  var yStep = param[1];
+  var xStep = param[0];
+  var match = maxes(input);
+  var maxY = match[1];
+  var maxX = match[0];
+  var numSteps = 0;
+  while((function () {
+          var nextX = coord.x + Math.imul(xStep, numSteps) | 0;
+          var nextY = coord.y + Math.imul(yStep, numSteps) | 0;
+          var nextCoord = getByCoord(input, [
+                nextX,
+                nextY
+              ]);
+          return Core__Option.mapOr(nextCoord, false, (function (nextCoord) {
+                        if (nextX >= 0 && nextX <= maxX && nextY >= 0 && nextY <= maxY) {
+                          return nextCoord !== color;
+                        } else {
+                          return false;
+                        }
+                      }));
+        })()) {
+    numSteps = numSteps + 1 | 0;
+  };
+  return numSteps;
+}
+
 var testRaw = {
+  input: [
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      4,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      4,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      8,
+      8,
+      8,
+      1,
+      1,
+      1,
+      4,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      8,
+      1,
+      8,
+      1,
+      1,
+      1,
+      4,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      8,
+      8,
+      8,
+      1,
+      1,
+      1,
+      4,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      4,
+      4,
+      4,
+      4,
+      4,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      3,
+      3,
+      1,
+      3,
+      3,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      3,
+      1,
+      1,
+      1,
+      3,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      3,
+      1,
+      1,
+      1,
+      3,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      3,
+      3,
+      1,
+      3,
+      3,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      6,
+      6,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      6,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      2,
+      2,
+      2,
+      1,
+      1,
+      1,
+      2,
+      2,
+      2,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      6,
+      1,
+      1,
+      1,
+      1
+    ]
+  ],
+  output: [
+    [
+      4,
+      4,
+      4,
+      4,
+      4,
+      1,
+      4,
+      4,
+      4,
+      4,
+      4
+    ],
+    [
+      4,
+      2,
+      2,
+      2,
+      1,
+      1,
+      1,
+      2,
+      2,
+      2,
+      4
+    ],
+    [
+      4,
+      2,
+      6,
+      6,
+      1,
+      1,
+      1,
+      6,
+      6,
+      2,
+      4
+    ],
+    [
+      4,
+      2,
+      6,
+      3,
+      3,
+      1,
+      3,
+      3,
+      6,
+      2,
+      4
+    ],
+    [
+      4,
+      1,
+      1,
+      3,
+      8,
+      8,
+      8,
+      3,
+      1,
+      1,
+      4
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      8,
+      1,
+      8,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      4,
+      1,
+      1,
+      3,
+      8,
+      8,
+      8,
+      3,
+      1,
+      1,
+      4
+    ],
+    [
+      4,
+      2,
+      6,
+      3,
+      3,
+      1,
+      3,
+      3,
+      6,
+      2,
+      4
+    ],
+    [
+      4,
+      2,
+      6,
+      6,
+      1,
+      1,
+      1,
+      6,
+      6,
+      2,
+      4
+    ],
+    [
+      4,
+      2,
+      2,
+      2,
+      1,
+      1,
+      1,
+      2,
+      2,
+      2,
+      4
+    ],
+    [
+      4,
+      4,
+      4,
+      4,
+      4,
+      1,
+      4,
+      4,
+      4,
+      4,
+      4
+    ]
+  ]
+};
+
+var test_input = toColors(testRaw.input);
+
+var test_output = toColors(testRaw.output);
+
+var test = {
+  input: test_input,
+  output: test_output
+};
+
+function main(input) {
+  var colorGroups = allColors.map(function (color) {
+          return getCoordsOfColors(input, [color]);
+        }).filter(function (coords) {
+        return coords.length !== 0;
+      });
+  var match = Belt_Array.partition(colorGroups, (function (v) {
+          return v.length === 1;
+        }));
+  var match$1 = Belt_Array.partition(match[1], (function (box) {
+          return getCorners(box).length > 0;
+        }));
+  var bgColor = match$1[1][0][0].color;
+  match$1[0].map(function (coords) {
+        var corners = getCorners(coords);
+        return corners.map(function (v) {
+                    if (v.TAG !== "TL") {
+                      return ;
+                    }
+                    var c = v._0;
+                    stepsToNext(input, c, bgColor, [
+                          0,
+                          1
+                        ]);
+                    if (corners.length > 0) {
+                      Core__Array.reduce(corners, 0, (function (acc, corner) {
+                              var corner_ = corner._0;
+                              return intMax(intMax(dist(corner_.x, c.x), dist(corner_.y, c.y)), acc);
+                            }));
+                      return ;
+                    }
+                    
+                  });
+      });
+}
+
+var output = main(test_input);
+
+var Solution_4290ef0e = {
+  testRaw: testRaw,
+  test: test,
+  main: main,
+  output: output
+};
+
+var testRaw$1 = {
   input: [
     [
       1,
@@ -608,29 +1462,26 @@ var testRaw = {
   ]
 };
 
-var test_input = toColors(testRaw.input);
+var test_input$1 = toColors(testRaw$1.input);
 
-var test_output = toColors(testRaw.output);
+var test_output$1 = toColors(testRaw$1.output);
 
-var test = {
-  input: test_input,
-  output: test_output
+var test$1 = {
+  input: test_input$1,
+  output: test_output$1
 };
 
-function main(input) {
+function main$1(input) {
   var blackRows = findLinesOfColor(input, "Black");
   var blackColumns = findLinesOfColor(transpose(input), "Black");
-  var match = dimensions(input);
-  var numCols = match[1];
-  var numRows = match[0];
-  var blockSpecs = getBlockSpecs(converses(blackRows, numRows), converses(blackColumns, numCols));
-  console.log(blackRows, blackColumns, converses(blackRows, numRows), converses(blackColumns, numCols), blockSpecs);
+  var match = maxes(input);
+  var blockSpecs = getBlockSpecs(converses(blackRows, match[0]), converses(blackColumns, match[1]));
   var blocks = carve(input, blockSpecs);
-  return Core__Option.flatMap(Belt_MapString.toArray(colorCount(Belt_Array.keepMap(blocksNonBlackColor(blocks), (function (param) {
-                              return param[1];
-                            })))).find(function (param) {
-                  return param[1] === 1;
-                }), (function (param) {
+  return Core__Option.flatMap(Belt_MapString.findFirstBy(colorCount(Belt_Array.keepMap(blocksNonBlackColor(blocks), (function (param) {
+                            return param[1];
+                          }))), (function (k, v) {
+                    return v === 1;
+                  })), (function (param) {
                 var k = param[0];
                 return Core__Option.map(blocksNonBlackColor(blocks).find(function (param) {
                                 return Core__Option.mapOr(param[1], false, (function (c) {
@@ -642,11 +1493,754 @@ function main(input) {
               }));
 }
 
-var output = main(test_input);
+var output$1 = main$1(test_input$1);
 
 var Solution_0b148d64 = {
-  test: test,
-  output: output
+  test: test$1,
+  output: output$1
+};
+
+var testRaw$2 = {
+  input: [
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      8,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      8,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      2
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      8,
+      1,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      8,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      8,
+      0,
+      0,
+      8,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      8,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      8,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      8,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      2
+    ],
+    [
+      8,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      8,
+      0,
+      0
+    ]
+  ],
+  output: [
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  ]
+};
+
+var test_input$2 = toColors(testRaw$2.input);
+
+var test_output$2 = toColors(testRaw$2.output);
+
+var test$2 = {
+  input: test_input$2,
+  output: test_output$2
+};
+
+function main$2(input) {
+  var hasOnlyFour = Belt_MapString.toArray(colorCount(Belt_Array.concatMany(input))).filter(function (param) {
+        return param[1] === 4;
+      });
+  var color = hasOnlyFour.find(function (param) {
+        return getCoordsOfColors(input, [stringToColor(param[0])]).every(function (c) {
+                    return isOnEdge([
+                                c.x,
+                                c.y
+                              ], input);
+                  });
+      });
+  var match = maxes(input);
+  var maxY = match[1];
+  var maxX = match[0];
+  return Core__Option.flatMap(color, (function (param) {
+                var colorCoords = getCoordsOfColors(input, [stringToColor(param[0])]);
+                if (reduceSatAll(colorCoords, [
+                        (function (c) {
+                            return c.x === 0;
+                          }),
+                        (function (c) {
+                            return c.x === 0;
+                          }),
+                        (function (c) {
+                            return c.x === maxX;
+                          }),
+                        (function (c) {
+                            return c.x === maxX;
+                          })
+                      ])) {
+                  var lefts = colorCoords.filter(function (c) {
+                        return c.x === 0;
+                      });
+                  var rights = colorCoords.filter(function (c) {
+                        return c.x === maxX;
+                      });
+                  var left0 = lefts[0];
+                  var left1 = lefts[1];
+                  var right0 = rights.find(function (r) {
+                        return r.y === left0.y;
+                      });
+                  var right1 = rights.find(function (r) {
+                        return r.y === left1.y;
+                      });
+                  if (right0 !== undefined && right1 !== undefined) {
+                    return adjustCol(adjustCol(blank("Black", maxX, maxY), right0.y, (function (param) {
+                                      return right0.color;
+                                    })), right1.y, (function (param) {
+                                  return right1.color;
+                                }));
+                  } else {
+                    return ;
+                  }
+                }
+                if (reduceSatAll(colorCoords, [
+                        (function (c) {
+                            return c.y === 0;
+                          }),
+                        (function (c) {
+                            return c.y === 0;
+                          }),
+                        (function (c) {
+                            return c.y === maxY;
+                          }),
+                        (function (c) {
+                            return c.y === maxY;
+                          })
+                      ])) {
+                  var tops = colorCoords.filter(function (c) {
+                        return c.y === 0;
+                      });
+                  var bottoms = colorCoords.filter(function (c) {
+                        return c.y === maxY;
+                      });
+                  var top0 = tops[0];
+                  var top1 = tops[1];
+                  var bottom0 = bottoms.find(function (b) {
+                        return b.x === top0.x;
+                      });
+                  var bottom1 = bottoms.find(function (b) {
+                        return b.x === top1.x;
+                      });
+                  if (bottom0 !== undefined && bottom1 !== undefined) {
+                    return adjustRow(adjustRow(blank("Black", maxX, maxY), bottom0.x, (function (param) {
+                                      return bottom0.color;
+                                    })), bottom1.x, (function (param) {
+                                  return bottom1.color;
+                                }));
+                  } else {
+                    return ;
+                  }
+                }
+                if (!reduceSatAll(colorCoords, [
+                        (function (c) {
+                            return c.x === 0;
+                          }),
+                        (function (c) {
+                            return c.x === maxX;
+                          }),
+                        (function (c) {
+                            return c.y === 0;
+                          }),
+                        (function (c) {
+                            return c.y === maxY;
+                          })
+                      ])) {
+                  return ;
+                }
+                var left = colorCoords.find(function (c) {
+                      return c.x === 0;
+                    });
+                var top = colorCoords.find(function (c) {
+                      return c.y === 0;
+                    });
+                if (left === undefined) {
+                  return ;
+                }
+                if (top === undefined) {
+                  return ;
+                }
+                var right = colorCoords.find(function (c) {
+                      if (c.y === left.y) {
+                        return c.x === maxX;
+                      } else {
+                        return false;
+                      }
+                    });
+                var bottom = colorCoords.find(function (c) {
+                      if (c.x === top.x) {
+                        return c.y === maxY;
+                      } else {
+                        return false;
+                      }
+                    });
+                if (right !== undefined && bottom !== undefined) {
+                  return adjustRow(adjustCol(blank("Black", maxX, maxY), left.y, (function (param) {
+                                    return left.color;
+                                  })), top.x, (function (param) {
+                                return top.color;
+                              }));
+                }
+                
+              }));
+}
+
+var output$2 = main$2(test_input$2);
+
+var Solution_6cdd2623 = {
+  testRaw: testRaw$2,
+  test: test$2,
+  main: main$2,
+  output: output$2
 };
 
 function Solutions$Grid(props) {
@@ -662,10 +2256,10 @@ function Solutions$Grid(props) {
                                                         }
                                                       });
                                           }),
-                                      className: "flex flex-col gap-px"
+                                      className: "flex flex-row gap-px"
                                     });
                         }),
-                    className: "flex flex-row gap-px bg-gray-600 w-fit "
+                    className: "flex flex-col gap-px bg-gray-600 w-fit "
                   }),
               className: "p-2 "
             });
@@ -679,19 +2273,19 @@ function Solutions(props) {
   return JsxRuntime.jsxs("div", {
               children: [
                 JsxRuntime.jsx(Solutions$Grid, {
-                      block: test_input
+                      block: test_input$1
                     }),
-                Core__Option.mapOr(output, null, (function (output_) {
+                Core__Option.mapOr(output$1, null, (function (output_) {
                         return JsxRuntime.jsxs("div", {
                                     children: [
                                       JsxRuntime.jsx(Solutions$Grid, {
                                             block: output_
                                           }),
                                       JsxRuntime.jsx(Solutions$Grid, {
-                                            block: test_output
+                                            block: test_output$1
                                           }),
                                       JsxRuntime.jsx("div", {
-                                            children: compareBlocks(output_, test_output) ? "Solved!" : "Unsolved",
+                                            children: compareBlocks(output_, test_output$1) ? "Solved!" : "Unsolved",
                                             className: "p-2 font-black text-xl"
                                           })
                                     ]
@@ -710,7 +2304,9 @@ export {
   keepMapWithIndex ,
   transpose ,
   findLinesOfColor ,
+  allColors ,
   colorToString ,
+  stringToColor ,
   colorToHex ,
   toColor ,
   toColors ,
@@ -719,7 +2315,7 @@ export {
   getLastEl ,
   appendToLastEl ,
   groups ,
-  dimensions ,
+  maxes ,
   allPairs ,
   subSet ,
   getBlockSpecs ,
@@ -727,7 +2323,24 @@ export {
   blocksNonBlackColor ,
   colorCount ,
   compareBlocks ,
+  isOnEdge ,
+  keepMapAll ,
+  getCoordsOfColors ,
+  reduceSatAll ,
+  blank ,
+  adjustRow ,
+  adjustCol ,
+  isAt ,
+  isAEvery ,
+  getCorners ,
+  unwrapCorner ,
+  intMax ,
+  dist ,
+  getByCoord ,
+  stepsToNext ,
+  Solution_4290ef0e ,
   Solution_0b148d64 ,
+  Solution_6cdd2623 ,
   Grid ,
   Solution ,
   make ,
