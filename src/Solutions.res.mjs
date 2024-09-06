@@ -5,6 +5,7 @@ import * as Common from "./Common.res.mjs";
 import * as Core__Option from "@rescript/core/src/Core__Option.res.mjs";
 import * as Solution_0b148d64 from "./solutions/Solution_0b148d64.res.mjs";
 import * as Solution_0d3d703e from "./solutions/Solution_0d3d703e.res.mjs";
+import * as Solution_3aa6fb7a from "./solutions/Solution_3aa6fb7a.res.mjs";
 import * as Solution_4290ef0e from "./solutions/Solution_4290ef0e.res.mjs";
 import * as Solution_6cdd2623 from "./solutions/Solution_6cdd2623.res.mjs";
 import * as JsxRuntime from "react/jsx-runtime";
@@ -92,7 +93,7 @@ var SolutionComp = {
 
 function Solutions(props) {
   var match = React.useState(function () {
-        return "0b148d64";
+        return "3aa6fb7a";
       });
   var setSelected = match[1];
   var selected = match[0];
@@ -100,7 +101,8 @@ function Solutions(props) {
     Solution_0b148d64.solutionExport,
     Solution_6cdd2623.solutionExport,
     Solution_4290ef0e.solutionExport,
-    Solution_0d3d703e.solutionExport
+    Solution_0d3d703e.solutionExport,
+    Solution_3aa6fb7a.solutionExport
   ];
   return JsxRuntime.jsxs("div", {
               children: [

@@ -340,6 +340,7 @@ let between = (v, a, b) => {
     v == a
   }
 }
+
 let adjustRel = (input, f, (coordX, coordY), (relX, relY)) => {
   input->Array.mapWithIndex((row, i) =>
     row->Array.mapWithIndex((el, j) => {
