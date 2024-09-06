@@ -38,7 +38,7 @@ var Grid = {
 function Solutions$SolutionComp(props) {
   var main = props.main;
   return JsxRuntime.jsx("div", {
-              children: props.tests.map(function (test) {
+              children: Common.allTests(props.data).map(function (test) {
                     return JsxRuntime.jsxs("div", {
                                 children: [
                                   JsxRuntime.jsxs("div", {
@@ -143,7 +143,7 @@ function Solutions(props) {
                                       });
                           })), null, (function (param) {
                         return JsxRuntime.jsx(Solutions$SolutionComp, {
-                                    tests: param.tests,
+                                    data: param.data,
                                     main: param.main
                                   });
                       }))

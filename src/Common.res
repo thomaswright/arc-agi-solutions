@@ -14,13 +14,20 @@ type corners = TL(coord) | TR(coord) | BL(coord) | BR(coord)
 
 // Test Types
 
+type dataBlock = array<array<int>>
+
+type dataPair = {"input": dataBlock, "output": dataBlock}
+
+type data = {"train": array<dataPair>, "test": array<dataPair>}
+
 type test = {
   input: block,
   output: block,
 }
+
 type solutionExport = {
   taskName: string,
-  tests: array<test>,
+  data: data,
   main: block => option<block>,
 }
 module type Puzz = {
@@ -355,7 +362,7 @@ let adjustAll = (input, f) => {
 
 // Testing
 
-let allTests = data => {
+let allTests = (data: data) => {
   Array.concat(data["train"], data["test"])->Array.map(v => {
     input: v["input"]->toColors,
     output: v["output"]->toColors,

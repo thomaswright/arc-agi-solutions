@@ -28,9 +28,10 @@ module Grid = {
 
 module SolutionComp = {
   @react.component
-  let make = (~tests, ~main) => {
+  let make = (~data, ~main) => {
     <div className="flex flex-col divide-y-2 divide-black">
-      {tests
+      {data
+      ->Common.allTests
       ->Array.map(test => {
         <div className="flex flex-row py-2">
           <div>
@@ -93,6 +94,6 @@ let make = () => {
     </div>
     {selected
     ->Option.flatMap(v => solutions->Array.find(s => s.taskName == v))
-    ->Option.mapOr(React.null, ({main, tests}) => <SolutionComp tests main />)}
+    ->Option.mapOr(React.null, ({main, data}) => <SolutionComp data main />)}
   </div>
 }
