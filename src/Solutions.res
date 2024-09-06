@@ -60,7 +60,7 @@ module SolutionComp = {
 
 @react.component
 let make = () => {
-  let (selected, setSelected) = React.useState(() => Some("0ca9ddb6"))
+  let (selected, setSelected) = React.useState(() => Some("0520fde7"))
   let solutions = [
     Solution_0b148d64.solutionExport,
     Solution_6cdd2623.solutionExport,
@@ -68,6 +68,7 @@ let make = () => {
     Solution_0d3d703e.solutionExport,
     Solution_3aa6fb7a.solutionExport,
     Solution_0ca9ddb6.solutionExport,
+    Solution_0520fde7.solutionExport,
   ]
 
   <div>
