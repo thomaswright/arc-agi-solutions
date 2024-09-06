@@ -468,6 +468,36 @@ function getCorners(coords) {
               }));
 }
 
+function insideCorner(corner) {
+  switch (corner.TAG) {
+    case "TL" :
+        var c = corner._0;
+        return [
+                c.x + 1 | 0,
+                c.y + 1 | 0
+              ];
+    case "TR" :
+        var c$1 = corner._0;
+        return [
+                c$1.x - 1 | 0,
+                c$1.y + 1 | 0
+              ];
+    case "BL" :
+        var c$2 = corner._0;
+        return [
+                c$2.x + 1 | 0,
+                c$2.y - 1 | 0
+              ];
+    case "BR" :
+        var c$3 = corner._0;
+        return [
+                c$3.x - 1 | 0,
+                c$3.y - 1 | 0
+              ];
+    
+  }
+}
+
 function unwrapCorner(c) {
   return c._0;
 }
@@ -604,6 +634,7 @@ export {
   isAt ,
   isAtEvery ,
   getCorners ,
+  insideCorner ,
   unwrapCorner ,
   intMax ,
   dist ,

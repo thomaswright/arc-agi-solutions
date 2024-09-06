@@ -291,6 +291,15 @@ let getCorners = coords => {
   })
 }
 
+let insideCorner = corner => {
+  switch corner {
+  | TR(c) => (c.x - 1, c.y + 1)
+  | TL(c) => (c.x + 1, c.y + 1)
+  | BR(c) => (c.x - 1, c.y - 1)
+  | BL(c) => (c.x + 1, c.y - 1)
+  }
+}
+
 let unwrapCorner = c =>
   switch c {
   | TL(c_) => c_

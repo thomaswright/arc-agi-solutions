@@ -8,41 +8,11 @@ var taskName = "3aa6fb7a";
 
 var data = Aa6fb7aJson;
 
-function insideCorner(corner) {
-  switch (corner.TAG) {
-    case "TL" :
-        var c = corner._0;
-        return [
-                c.x + 1 | 0,
-                c.y + 1 | 0
-              ];
-    case "TR" :
-        var c$1 = corner._0;
-        return [
-                c$1.x - 1 | 0,
-                c$1.y + 1 | 0
-              ];
-    case "BL" :
-        var c$2 = corner._0;
-        return [
-                c$2.x + 1 | 0,
-                c$2.y - 1 | 0
-              ];
-    case "BR" :
-        var c$3 = corner._0;
-        return [
-                c$3.x - 1 | 0,
-                c$3.y - 1 | 0
-              ];
-    
-  }
-}
-
 function main(input) {
   return Core__Array.reduce(Common.getCorners(Common.getCoordsOfColors(input, ["Cyan"])), input, (function (acc, cur) {
                 return Common.adjustRel(acc, (function (param) {
                               return "Blue";
-                            }), insideCorner(cur), [
+                            }), Common.insideCorner(cur), [
                             0,
                             0
                           ]);
@@ -58,7 +28,6 @@ var solutionExport = {
 export {
   taskName ,
   data ,
-  insideCorner ,
   main ,
   solutionExport ,
 }
