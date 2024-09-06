@@ -4,6 +4,7 @@ import * as React from "react";
 import * as Common from "./Common.res.mjs";
 import * as Core__Option from "@rescript/core/src/Core__Option.res.mjs";
 import * as Solution_0b148d64 from "./solutions/Solution_0b148d64.res.mjs";
+import * as Solution_0ca9ddb6 from "./solutions/Solution_0ca9ddb6.res.mjs";
 import * as Solution_0d3d703e from "./solutions/Solution_0d3d703e.res.mjs";
 import * as Solution_3aa6fb7a from "./solutions/Solution_3aa6fb7a.res.mjs";
 import * as Solution_4290ef0e from "./solutions/Solution_4290ef0e.res.mjs";
@@ -93,7 +94,7 @@ var SolutionComp = {
 
 function Solutions(props) {
   var match = React.useState(function () {
-        return "3aa6fb7a";
+        return "0ca9ddb6";
       });
   var setSelected = match[1];
   var selected = match[0];
@@ -102,7 +103,8 @@ function Solutions(props) {
     Solution_6cdd2623.solutionExport,
     Solution_4290ef0e.solutionExport,
     Solution_0d3d703e.solutionExport,
-    Solution_3aa6fb7a.solutionExport
+    Solution_3aa6fb7a.solutionExport,
+    Solution_0ca9ddb6.solutionExport
   ];
   return JsxRuntime.jsxs("div", {
               children: [
