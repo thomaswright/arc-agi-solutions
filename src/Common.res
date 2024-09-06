@@ -345,6 +345,14 @@ let adjustRel = (input, f, (coordX, coordY), (relX, relY)) => {
   )
 }
 
+let adjustAll = (input, f) => {
+  input->Array.mapWithIndex((row, i) => {
+    row->Array.mapWithIndex((el, j) => {
+      f(el, i, j)
+    })
+  })
+}
+
 // Testing
 
 let allTests = data => {

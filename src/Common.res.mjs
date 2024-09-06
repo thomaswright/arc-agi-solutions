@@ -554,6 +554,14 @@ function adjustRel(input, f, param, param$1) {
             });
 }
 
+function adjustAll(input, f) {
+  return input.map(function (row, i) {
+              return row.map(function (el, j) {
+                          return f(el, i, j);
+                        });
+            });
+}
+
 function allTests(data) {
   return data.train.concat(data.test).map(function (v) {
               return {
@@ -603,6 +611,7 @@ export {
   stepsToNext ,
   between ,
   adjustRel ,
+  adjustAll ,
   allTests ,
 }
 /* No side effect */

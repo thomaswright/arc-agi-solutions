@@ -64,6 +64,7 @@ let make = () => {
     Solution_0b148d64.solutionExport,
     Solution_6cdd2623.solutionExport,
     Solution_4290ef0e.solutionExport,
+    Solution_0d3d703e.solutionExport,
   ]
 
   <div>

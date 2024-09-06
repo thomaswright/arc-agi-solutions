@@ -4,6 +4,7 @@ import * as React from "react";
 import * as Common from "./Common.res.mjs";
 import * as Core__Option from "@rescript/core/src/Core__Option.res.mjs";
 import * as Solution_0b148d64 from "./solutions/Solution_0b148d64.res.mjs";
+import * as Solution_0d3d703e from "./solutions/Solution_0d3d703e.res.mjs";
 import * as Solution_4290ef0e from "./solutions/Solution_4290ef0e.res.mjs";
 import * as Solution_6cdd2623 from "./solutions/Solution_6cdd2623.res.mjs";
 import * as JsxRuntime from "react/jsx-runtime";
@@ -98,7 +99,8 @@ function Solutions(props) {
   var solutions = [
     Solution_0b148d64.solutionExport,
     Solution_6cdd2623.solutionExport,
-    Solution_4290ef0e.solutionExport
+    Solution_4290ef0e.solutionExport,
+    Solution_0d3d703e.solutionExport
   ];
   return JsxRuntime.jsxs("div", {
               children: [
