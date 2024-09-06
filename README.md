@@ -1,6 +1,6 @@
 # Arc (non) Agi Solutions
 
-Non agi solutions to https://arcprize.org/play?task=09629e4f
+Non agi solutions to https://arcprize.org
 
 https://github.com/fchollet/ARC-AGI
 
