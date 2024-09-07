@@ -366,28 +366,6 @@ function blank(color, x, y) {
             });
 }
 
-function adjustRow(input, rowNum, f) {
-  return input.map(function (row, i) {
-              if (i === rowNum) {
-                return row.map(f);
-              } else {
-                return row;
-              }
-            });
-}
-
-function adjustCol(input, colNum, f) {
-  return input.map(function (row, _i) {
-              return row.map(function (el, j) {
-                          if (j === colNum) {
-                            return f(el);
-                          } else {
-                            return el;
-                          }
-                        });
-            });
-}
-
 function isAt(a, b, param) {
   if ((a.x - param[0] | 0) === b.x) {
     return (a.y - param[1] | 0) === b.y;
@@ -550,7 +528,7 @@ function stepsToNext(input, color, param, param$1) {
   return numSteps;
 }
 
-function between(v, a, b) {
+function isBetween(v, a, b) {
   if (Caml_obj.greaterthan(a, b)) {
     if (Caml_obj.greaterthan(v, b)) {
       return Caml_obj.lessequal(v, a);
@@ -568,6 +546,42 @@ function between(v, a, b) {
   }
 }
 
+function adjustRow(input, rowNum, f) {
+  return input.map(function (row, i) {
+              if (i === rowNum) {
+                return row.map(f);
+              } else {
+                return row;
+              }
+            });
+}
+
+function adjustCol(input, colNum, f) {
+  return input.map(function (row, _i) {
+              return row.map(function (el, j) {
+                          if (j === colNum) {
+                            return f(el);
+                          } else {
+                            return el;
+                          }
+                        });
+            });
+}
+
+function adjustOne(input, f, param) {
+  var coordY = param[1];
+  var coordX = param[0];
+  return input.map(function (row, i) {
+              return row.map(function (el, j) {
+                          if (i === coordX && j === coordY) {
+                            return f(el);
+                          } else {
+                            return el;
+                          }
+                        });
+            });
+}
+
 function adjustRel(input, f, param, param$1) {
   var relY = param$1[1];
   var relX = param$1[0];
@@ -575,7 +589,7 @@ function adjustRel(input, f, param, param$1) {
   var coordX = param[0];
   return input.map(function (row, i) {
               return row.map(function (el, j) {
-                          if (between(i, coordX, coordX + relX | 0) && between(j, coordY, coordY + relY | 0)) {
+                          if (isBetween(i, coordX, coordX + relX | 0) && isBetween(j, coordY, coordY + relY | 0)) {
                             return f(el);
                           } else {
                             return el;
@@ -629,8 +643,6 @@ export {
   getCoordsOfColors ,
   reduceSatAll ,
   blank ,
-  adjustRow ,
-  adjustCol ,
   isAt ,
   isAtEvery ,
   getCorners ,
@@ -640,7 +652,10 @@ export {
   dist ,
   getByCoord ,
   stepsToNext ,
-  between ,
+  isBetween ,
+  adjustRow ,
+  adjustCol ,
+  adjustOne ,
   adjustRel ,
   adjustAll ,
   allTests ,

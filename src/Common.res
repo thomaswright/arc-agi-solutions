@@ -254,16 +254,6 @@ let blank = (color, x, y) => {
   range(x)->Array.map(_ => range(y)->Array.map(_ => color))
 }
 
-let adjustRow = (input, rowNum, f) => {
-  input->Array.mapWithIndex((row, i) => i == rowNum ? row->Array.map(f) : row)
-}
-
-let adjustCol = (input, colNum, f) => {
-  input->Array.mapWithIndex((row, _i) =>
-    row->Array.mapWithIndex((el, j) => j == colNum ? f(el) : el)
-  )
-}
-
 let isAt = (a, b, (x, y)) => {
   a.x - x == b.x && a.y - y == b.y
 }
@@ -340,7 +330,7 @@ let stepsToNext = (input: block, color, (xCoord, yCoord), (xStep, yStep)) => {
   numSteps.contents
 }
 
-let between = (v, a, b) => {
+let isBetween = (v, a, b) => {
   if a > b {
     v > b && v <= a
   } else if a < b {
@@ -350,10 +340,32 @@ let between = (v, a, b) => {
   }
 }
 
+let adjustRow = (input, rowNum, f) => {
+  input->Array.mapWithIndex((row, i) => i == rowNum ? row->Array.map(f) : row)
+}
+
+let adjustCol = (input, colNum, f) => {
+  input->Array.mapWithIndex((row, _i) =>
+    row->Array.mapWithIndex((el, j) => j == colNum ? f(el) : el)
+  )
+}
+
+let adjustOne = (input, f, (coordX, coordY)) => {
+  input->Array.mapWithIndex((row, i) =>
+    row->Array.mapWithIndex((el, j) => {
+      if i == coordX && j == coordY {
+        f(el)
+      } else {
+        el
+      }
+    })
+  )
+}
+
 let adjustRel = (input, f, (coordX, coordY), (relX, relY)) => {
   input->Array.mapWithIndex((row, i) =>
     row->Array.mapWithIndex((el, j) => {
-      if i->between(coordX, coordX + relX) && j->between(coordY, coordY + relY) {
+      if i->isBetween(coordX, coordX + relX) && j->isBetween(coordY, coordY + relY) {
         f(el)
       } else {
         el
